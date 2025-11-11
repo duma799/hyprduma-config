@@ -5,7 +5,7 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ## Features
 
 ### Enhanced Keybindings
-- **See in KEYBINDS.md (link below)
+- See in KEYBINDS.md (link below)
 - **[KEYBINDS.md](KEYBINDS.md)** - Complete keybindings reference
 
 ### Visual & UX

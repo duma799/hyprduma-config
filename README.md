@@ -31,8 +31,7 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ### Requirements
 ```bash
 # Arch Linux
-sudo pacman -S hyprland kitty waybar hyprpaper wofi \
-               brightnessctl playerctl wl-clipboard
+sudo pacman -S hyprland kitty waybar hyprpaper wofi hyprlock hyprshot
 ```
 
 ### Installation

@@ -23,7 +23,7 @@
 | `SUPER + Q` | Terminal (kitty) |
 | `SUPER + F` | File Manager |
 | `SUPER + B` | Browser |
-| `SUPER + T` | Telegran |
+| `SUPER + T` | Telegram |
 | `SUPER + R` | App Launcher (wofi) |
 | `SUPER + S` | Screenshot (selected area) |
 | `SHIFT + C` | VSCode |

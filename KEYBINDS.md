@@ -7,7 +7,8 @@
 | Keybind | Action |
 |---------|--------|
 | `SUPER + C` | Close window |
-| `SUPER + P` | Poweroff (Shutdown) |
+| `SUPER + P` | Poweroff |
+| `SUPER + RETURN` | Wlogout |
 | `SUPER + M` | Exit Hyprland |
 | `SUPER + L` | Lock screen |
 | `SUPER + Z` | Toggle floating |

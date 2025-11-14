@@ -31,7 +31,7 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ### Requirements
 ```bash
 # Core Hyprland components
-sudo pacman -S hyprland hyprlock hyprshot
+sudo pacman -S hyprland hyprlock hyprshot wlogout
 
 # Terminal & Shell
 sudo pacman -S kitty

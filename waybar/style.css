@@ -33,7 +33,7 @@ tooltip {
     background:@background;
     color: @color7;
 }
-#pulseaudio:hover, #bluetooth:hover, #network:hover, #custom-power-profile:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover{
+#pulseaudio:hover, #bluetooth:hover, #network:hover, #custom-power-profile:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover, #custom-wlogout:hover{
     transition: all .3s ease;
     color:@color9;
 }
@@ -155,4 +155,11 @@ tooltip {
     color:transparent;
     text-shadow: 0px 0px 1.5px rgba(0, 0, 0, 1);
 
+}
+#custom-wlogout{
+    padding: 0px 3px;
+    margin-left: -2px;
+    font-size: 21px;
+    transition: all .3s ease;
+    color:@color7;
 }

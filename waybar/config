@@ -5,7 +5,7 @@
     "reload_style_on_change": true,
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["group/expand","pulseaudio","bluetooth","network","custom/power-profile","battery"],
+    "modules-right": ["group/expand","pulseaudio","bluetooth","network","custom/power-profile","battery","custom/wlogout"],
 
     "hyprland/workspaces": {
         "format": "{name}",
@@ -112,5 +112,10 @@
     "temperature": {
         "critical-threshold": 80,
         "format": ""
+    },
+    "custom/wlogout": {
+        "format": "⏻",
+        "tooltip": false,
+        "on-click": "wlogout"
     }
 }

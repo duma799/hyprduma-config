@@ -1,10 +1,11 @@
 {
     "layer": "top",
     "position": "top",
+    "output": "HDMI-A-1",
     "reload_style_on_change": true,
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["group/expand","pulseaudio","bluetooth","network","battery"],
+    "modules-right": ["group/expand","pulseaudio","bluetooth","network","custom/power-profile","battery"],
 
     "hyprland/workspaces": {
         "format": "{name}",
@@ -55,10 +56,10 @@
             "warning": 30,
             "critical": 20
         },
-        "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% 󰂄",
-        "format-plugged": "{capacity}% 󰂄 ",
-        "format-alt": "{time} {icon}",
+        "format": "{icon}",
+        "format-charging": "󰂄",
+        "format-plugged": "󰂄",
+        "tooltip-format": "{capacity}%",
         "format-icons": [
             "󰁻",
             "󰁼",
@@ -67,6 +68,14 @@
             "󰂂",
             "󰁹"
         ]
+    },
+    "custom/power-profile": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 10,
+        "exec": "~/hyprduma-config/waybar/scripts/power-profile.sh",
+        "on-click": "~/hyprduma-config/waybar/scripts/power-profile.sh --cycle && pkill -RTMIN+8 waybar",
+        "signal": 8
     },
     "custom/expand": {
         "format": "",

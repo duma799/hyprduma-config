@@ -33,7 +33,7 @@ tooltip {
     background:@background;
     color: @color7;
 }
-#pulseaudio:hover, #bluetooth:hover, #network:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover{
+#pulseaudio:hover, #bluetooth:hover, #network:hover, #custom-power-profile:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover{
     transition: all .3s ease;
     color:@color9;
 }
@@ -79,7 +79,7 @@ tooltip {
     text-shadow: 0px 0px 8px @color1, 0px 0px 15px @color1;
 }
 #bluetooth{
-    padding: 0px 5px;
+    padding: 0px 3px;
     transition: all .3s ease;
     color:@color7;
 
@@ -99,12 +99,16 @@ tooltip {
 #pulseaudio.muted{
     color: #f53c3c;
 }
+#custom-power-profile{
+    padding: 0px 5px;
+    transition: all .3s ease;
+    color:@color7;
+
+}
 #battery{
     padding: 0px 5px;
     transition: all .3s ease;
     color:@color7;
-    font-family: "JetBrains Mono";
-    font-weight: bold;
 
 }
 #battery.charging {

@@ -1,0 +1,66 @@
+* {
+    all: unset;
+    background-image: none;
+    box-shadow: none;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+}
+
+window {
+    background: url("../../.local/state/caelestia/wallpaper/blur"), rgba(31, 33, 36, 0.7);
+    background-size: cover;
+    background-position: center;
+}
+
+button {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20%;
+    transition: 200ms linear;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 20px;
+    margin: 10px;
+    color: #e3e6f0;
+    background-color: rgba(31, 33, 36, 0.2);
+    border: #c1c4cb 5px solid;
+    box-shadow: 2px 3px 8px rgba(31, 33, 36, 0.5);
+}
+
+button:hover,
+button:focus {
+    background-color: rgba(31, 33, 36, 0.5);
+    border: #898b91 5px solid;
+}
+
+button:focus {
+    background-size: 22%;
+}
+
+button:active {
+    background-color: rgba(31, 33, 36, 0.6);
+    border: #9b9da1 5px solid;
+}
+
+#lock {
+    background-image: url("./icons/lock.png");
+}
+
+#logout {
+    background-image: url("./icons/logout.png");
+}
+
+#suspend {
+    background-image: url("./icons/suspend.png");
+}
+
+#hibernate {
+    background-image: url("./icons/hibernate.png");
+}
+
+#shutdown {
+    background-image: url("./icons/shutdown.png");
+}
+
+#reboot {
+    background-image: url("./icons/reboot.png");
+}

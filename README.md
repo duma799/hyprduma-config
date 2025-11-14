@@ -30,8 +30,36 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 
 ### Requirements
 ```bash
-# Arch Linux
-sudo pacman -S hyprland kitty waybar hyprpaper wofi hyprlock hyprshot
+# Core Hyprland components
+sudo pacman -S hyprland hyprlock hyprshot
+
+# Terminal & Shell
+sudo pacman -S kitty
+
+# Status bar & Wallpaper
+sudo pacman -S waybar swww waypaper
+
+# Application launcher
+sudo pacman -S wofi
+
+# File manager (GNOME)
+sudo pacman -S nautilus
+
+# Audio control (PipeWire)
+sudo pacman -S wireplumber pipewire-pulse
+
+# Brightness control
+sudo pacman -S brightnessctl
+
+# Media player control
+sudo pacman -S playerctl
+
+# Optional applications (adjust in config)
+sudo pacman -S telegram-desktop spotify code  # Telegram, Spotify, VSCode
+yay -S google-chrome  # Browser (AUR)
+
+# Cursor theme
+sudo pacman -S adwaita-cursors
 ```
 
 ### Installation

@@ -20,14 +20,16 @@
 
 | Keybind | Application |
 |---------|-------------|
-| `SUPER + Q` | Terminal (kitty) |
+| `SUPER + Q` | Terminal |
 | `SUPER + F` | File Manager |
 | `SUPER + B` | Browser |
 | `SUPER + T` | Telegram |
-| `SUPER + R` | App Launcher (wofi) |
-| `SUPER + S` | Screenshot (selected area) |
-| `SHIFT + C` | VSCode |
-| `CTRL + SHIFT + ESCAPE` | Task Manager (htop) |
+| `SUPER + V` | VSCode |
+| `SUPER + S` | Spotify |
+| `SUPER + W` | Waypaper |
+| `SUPER + R` | App Launcher |
+| `SUPER + SHIFT + S` | Screenshot |
+| `CTRL + SHIFT + ESCAPE` | Task Manager |
 
 ---
 
@@ -36,10 +38,10 @@
 | Keybind | Action |
 |---------|--------|
 | `ALT + ←/→/↑/↓` | Move focus |
-| `ALT + TAB` | Cycle windows (forward) |
-| `SUPER + TAB` | Cycle windows (backward) |
+| `ALT + TAB` | Cycle windows |
+| `SUPER + TAB` | Cycle windows backwards |
 | `ALT + CTRL + ←/→/↑/↓` | Resize window |
-| `ALT + ←/→/↑/↓` | Move cursor |
+| `ALT + SHIFT + ←/→/↑/↓` | Move window |
 
 ---
 
@@ -113,7 +115,7 @@
 - Use `SUPER + SHIFT + [number]` to throw windows between monitors
 
 ### Screenshots
-1. Press `SHIFT + S`
+1. Press `SUPER + SHIFT + S`
 2. Select area with mouse
 3. Find in `~/Pictures/Screenshots/Screenshot_YYYY-MM-DD_HH:MM:SS.png`
 

@@ -33,7 +33,7 @@ tooltip {
     background:@background;
     color: @color7;
 }
-#clock:hover, #bluetooth:hover, #network:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover{
+#pulseaudio:hover, #bluetooth:hover, #network:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover{
     transition: all .3s ease;
     color:@color9;
 }
@@ -89,6 +89,15 @@ tooltip {
     transition: all .3s ease;
     color:@color7;
 
+}
+#pulseaudio{
+    padding: 0px 5px;
+    transition: all .3s ease;
+    color:@color7;
+
+}
+#pulseaudio.muted{
+    color: #f53c3c;
 }
 #battery{
     padding: 0px 5px;

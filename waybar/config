@@ -4,7 +4,7 @@
     "reload_style_on_change": true,
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["group/expand","bluetooth","network","battery"],
+    "modules-right": ["group/expand","pulseaudio","bluetooth","network","battery"],
 
     "hyprland/workspaces": {
         "format": "{name}",
@@ -14,17 +14,7 @@
     },
     "clock": {
         "format": "{:%H:%M}",
-        "interval": 1,
-        "tooltip-format": "<tt>{calendar}</tt>",
-        "calendar": {
-            "format": {
-                "today": "<span color='#fAfBfC'><b>{}</b></span>"
-            }
-        },
-        "actions": {
-            "on-click-right": "shift_down",
-            "on-click": "shift_up"
-        }
+        "interval": 1
     },
     "network": {
         "interface": "wlo1",
@@ -35,6 +25,16 @@
         "tooltip-format-wifi": "{essid} ({signalStrength}%)",
         "tooltip-format-ethernet": "{ifname}",
         "on-click": "kitty nmtui"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰖁",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "tooltip-format": "{volume}%",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pwvucontrol"
     },
     "bluetooth": {
         "format-on": "󰂯",

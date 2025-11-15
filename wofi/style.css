@@ -1,0 +1,55 @@
+* {
+    font-family: "CodeNewRoman Nerd Font Propo";
+    font-size: 14px;
+}
+
+window {
+    margin: 0px;
+    border: 3px solid #89b4fa;
+    background-color: #1e1e2e;
+    border-radius: 15px;
+}
+
+#input {
+    margin: 10px;
+    padding: 8px 15px;
+    border: none;
+    color: #cdd6f4;
+    background-color: #313244;
+    border-radius: 10px;
+}
+
+#inner-box {
+    margin: 5px;
+    padding: 10px;
+    background-color: transparent;
+}
+
+#outer-box {
+    margin: 5px;
+    padding: 5px;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#entry {
+    padding: 5px;
+    border-radius: 8px;
+}
+
+#entry:selected {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+}
+
+#text {
+    color: #cdd6f4;
+}
+
+#text:selected {
+    color: #1e1e2e;
+}

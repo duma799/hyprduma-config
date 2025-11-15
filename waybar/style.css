@@ -12,25 +12,22 @@ window#waybar{
     padding:1px 3px;
     margin:5px 0px 5px 10px;
     border-radius:13px;
-    background: alpha(@background,.6);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, .6);
+    background: #000000;
+    border: none;
 }
 .modules-center {
     padding:1px 5px;
     margin:5px 0px 5px 0px;
     border-radius:13px;
-    background: alpha(@background,.6);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, .6);
+    background: #000000;
+    border: none;
 }
 .modules-right {
     padding:1px 3px;
     margin:5px 10px 5px 0px;
     border-radius:13px;
-    background: alpha(@background,.6);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, .6);
+    background: #000000;
+    border: none;
 }
 tooltip {
     background:@background;
@@ -38,12 +35,15 @@ tooltip {
 }
 #pulseaudio:hover, #bluetooth:hover, #network:hover, #custom-power-profile:hover, #battery:hover, #cpu:hover, #memory:hover, #temperature:hover, #custom-wlogout:hover{
     transition: all .3s ease;
-    color:@color9;
+    color:@color1;
+    text-shadow: 0px 0px 8px @color1;
 }
 #clock{
     padding: 3px 5px 2px 5px;
     color:@color7;
+    font-family: "JetBrains Mono";
     font-weight: 600;
+    text-shadow: 0px 0px 5px @color1;
     transition: all .3s ease;
 }
 #workspaces {

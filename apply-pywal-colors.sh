@@ -6,6 +6,15 @@
 
 echo "Applying pywal colors to Hyprland and Caelestia..."
 
+# Update Caelestia's wallpaper reference to match the one pywal used
+if [ -f ~/.cache/wal/wal ]; then
+    WALLPAPER_PATH=$(cat ~/.cache/wal/wal)
+    mkdir -p ~/.local/state/caelestia/wallpaper
+    ln -sf "$WALLPAPER_PATH" ~/.local/state/caelestia/wallpaper/current
+    echo "$WALLPAPER_PATH" > ~/.local/state/caelestia/wallpaper/path.txt
+    echo "✓ Caelestia wallpaper reference updated"
+fi
+
 # Copy the generated Caelestia scheme to the proper location
 if [ -f ~/.cache/wal/caelestia-scheme.json ]; then
     mkdir -p ~/.local/state/caelestia

@@ -14,6 +14,7 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 - Smooth custom animations with bezier curves
 - Automatic floating for file pickers and dialogs (in progress)
 - Picture-in-Picture auto-positioning (in progress)
+- **Pywal integration** - Dynamic colors from wallpaper (optional)
 
 ### Input
 - 3-finger gestures (horizontal: workspace, vertical: fullscreen)
@@ -79,6 +80,26 @@ nvim ~/.config/hypr/hyprland.conf
 ## Documentation
 
 - **[KEYBINDS.md](KEYBINDS.md)** - Complete keybindings reference
+- **[PYWAL-SETUP.md](PYWAL-SETUP.md)** - Pywal color integration setup guide (optional)
+
+## Optional: Pywal Integration
+
+This config includes optional pywal integration for dynamic theming based on your wallpaper. See [PYWAL-SETUP.md](PYWAL-SETUP.md) for installation and usage instructions.
+
+**Quick setup:**
+```bash
+# Install pywal
+sudo pacman -S python-pywal
+
+# Copy templates and script
+mkdir -p ~/.config/wal/templates
+cp wal/templates/* ~/.config/wal/templates/
+cp apply-pywal-colors.sh ~/.config/hypr/
+chmod +x ~/.config/hypr/apply-pywal-colors.sh
+
+# Generate colors from wallpaper
+wal -i /path/to/wallpaper.png && ~/.config/hypr/apply-pywal-colors.sh
+```
 
 ## Note
 

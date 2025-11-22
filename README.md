@@ -77,13 +77,13 @@ sudo pacman -S telegram-desktop spotify code
 yay -S google-chrome zen-browser-bin  # or your preferred browser
 ```
 
-### Step 3: Install Caelestia Shell (Optional)
+### Step 3: Install Caelestia Shell (Recommended)
 
 Caelestia is a modern shell with AI features that integrates with the pywal theming system.
 
 ```bash
-# Install Caelestia via cargo
-cargo install caelestia
+# Install Caelestia via yay
+yay -S caelestia-shell # caelestia-shell-git is bleeding edge & unstable one
 
 # Start Caelestia daemon (it will auto-restart when pywal colors change)
 caelestia shell -d &
@@ -159,16 +159,20 @@ mkdir -p ~/.config/wal/templates
 cp -r wal/templates/* ~/.config/wal/templates/
 
 # Copy the color application and wallpaper sync scripts
-cp apply-pywal-colors.sh ~/.config/hypr/
+cp pywal.sh ~/.config/hypr/
 cp sync-caelestia-wallpaper.sh ~/.config/hypr/
-chmod +x ~/.config/hypr/apply-pywal-colors.sh
+chmod +x ~/.config/hypr/pywal.sh
 chmod +x ~/.config/hypr/sync-caelestia-wallpaper.sh
+
+# Also copy to home directory for easier access
+cp pywal.sh ~/pywal.sh
+chmod +x ~/pywal.sh
 
 # Test pywal with a wallpaper
 wal -i /path/to/your/wallpaper.png
 
-# Apply colors to Hyprland and Caelestia
-~/.config/hypr/apply-pywal-colors.sh
+# Apply colors to Hyprland and Caelestia (from anywhere)
+~/pywal.sh
 ```
 
 **What this does:**
@@ -223,10 +227,10 @@ nvim ~/.config/hypr/hyprland.conf
 
 ```bash
 # Generate colors and apply them
-wal -i /path/to/wallpaper.png && ~/.config/hypr/apply-pywal-colors.sh
+wal -i /path/to/wallpaper.png && ~/pywal.sh
 
 # Or use the wallpapers included in this repo
-wal -i ~/.config/hypr/wallpapers/sakura.jpg && ~/.config/hypr/apply-pywal-colors.sh
+wal -i ~/.config/hypr/wallpapers/sakura.jpg && ~/pywal.sh
 ```
 
 **Note about waypaper and Caelestia:**
@@ -278,9 +282,9 @@ kb_layout = us, ru  # Change to your layouts
 - Check if the applications are actually installed
 
 ### Pywal colors not applying
-- Ensure the script is executable: `chmod +x ~/.config/hypr/apply-pywal-colors.sh`
+- Ensure the script is executable: `chmod +x ~/pywal.sh`
 - Check if pywal cache exists: `ls ~/.cache/wal/`
-- Manually reload: `~/.config/hypr/apply-pywal-colors.sh`
+- Manually reload: `~/pywal.sh`
 
 ### Caelestia colors not updating
 ```bash

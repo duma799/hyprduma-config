@@ -39,10 +39,14 @@ cp wal/templates/caelestia-scheme.json ~/.config/wal/templates/
 
 ```bash
 # Copy the color application script to your hypr config
-cp apply-pywal-colors.sh ~/.config/hypr/
+cp pywal.sh ~/.config/hypr/
 
 # Make it executable
-chmod +x ~/.config/hypr/apply-pywal-colors.sh
+chmod +x ~/.config/hypr/pywal.sh
+
+# Also copy to home directory for easier access
+cp pywal.sh ~/pywal.sh
+chmod +x ~/pywal.sh
 ```
 
 ### 4. Link Hyprland Config
@@ -65,22 +69,22 @@ ln -s ~/hyprduma-config/hyprland.conf ~/.config/hypr/hyprland.conf
 # Generate color palette from a wallpaper
 wal -i /path/to/your/wallpaper.png
 
-# Apply the generated colors to Hyprland and Caelestia
-~/.config/hypr/apply-pywal-colors.sh
+# Apply the generated colors to Hyprland and Caelestia (from anywhere)
+~/pywal.sh
 ```
 
 ### Quick Apply (One Command)
 
 ```bash
 # Generate and apply in one go
-wal -i /path/to/wallpaper.png && ~/.config/hypr/apply-pywal-colors.sh
+wal -i /path/to/wallpaper.png && ~/pywal.sh
 ```
 
 ### Regenerate from Current Wallpaper
 
 ```bash
 # Regenerate colors from cached wallpaper
-wal -R && ~/.config/hypr/apply-pywal-colors.sh
+wal -R && ~/pywal.sh
 ```
 
 ## What Gets Themed
@@ -100,7 +104,7 @@ wal -R && ~/.config/hypr/apply-pywal-colors.sh
 ```
 hyprduma-config/
 ├── hyprland.conf                    # Main config with pywal integration
-├── apply-pywal-colors.sh            # Script to apply colors
+├── pywal.sh                         # Script to apply colors (easy name!)
 └── wal/
     └── templates/
         ├── hyprland-colors.conf     # Hyprland border colors template
@@ -155,7 +159,7 @@ If using `waypaper`, `hyprpaper`, or similar:
 hyprctl hyprpaper wallpaper "eDP-1,/path/to/wallpaper.png"
 
 # Generate and apply pywal colors
-wal -i /path/to/wallpaper.png && ~/.config/hypr/apply-pywal-colors.sh
+wal -i /path/to/wallpaper.png && ~/pywal.sh
 ```
 
 ## Troubleshooting

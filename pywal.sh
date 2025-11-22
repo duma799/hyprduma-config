@@ -1,10 +1,10 @@
 #!/bin/bash
-# Script to apply pywal colors to Hyprland and Caelestia shell
+# Script to apply pywal colors to Hyprland, Caelestia shell, and Kitty terminal
 
 # Generate pywal colors (this assumes you've already run 'wal -i /path/to/wallpaper')
 # The templates will be automatically processed
 
-echo "Applying pywal colors to Hyprland and Caelestia..."
+echo "Applying pywal colors to Hyprland, Caelestia, and Kitty..."
 
 # Update Caelestia's wallpaper reference to match the one pywal used
 if [ -f ~/.cache/wal/wal ]; then
@@ -34,6 +34,14 @@ if pgrep -x "caelestia" > /dev/null; then
     sleep 0.5
     caelestia shell -d &
     echo "✓ Caelestia shell restarted"
+fi
+
+# Reload all running Kitty instances
+if command -v kitty &> /dev/null; then
+    if pgrep -x "kitty" > /dev/null; then
+        killall -SIGUSR1 kitty 2>/dev/null
+        echo "✓ Kitty terminal colors reloaded"
+    fi
 fi
 
 echo "Done! Colors applied successfully."

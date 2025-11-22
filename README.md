@@ -30,54 +30,33 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 
 Follow these steps in order to install the complete setup from scratch.
 
+### Prerequisites: Install AUR Helpers (Optional but Recommended)
+
+If you don't have yay and paru installed yet, you can install both:
+
+```bash
+# Install yay
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+cd .. && rm -rf yay
+
+# Install paru
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+cd .. && rm -rf paru
+```
+
 ### Step 1: Install Required Packages
 
 ```bash
-# Core Hyprland components
-sudo pacman -S hyprland hyprlock hyprshot wlogout
-
-# Terminal emulator
-sudo pacman -S kitty
-
-# Status bar & Wallpaper manager
-sudo pacman -S waybar swaybg waypaper
-
-# Application launcher
-sudo pacman -S wofi
-
-# File manager
-sudo pacman -S nautilus
-
-# Audio control (PipeWire)
-sudo pacman -S wireplumber pipewire-pulse
-
-# Brightness control
-sudo pacman -S brightnessctl
-
-# Media player control
-sudo pacman -S playerctl
-
-# Cursor theme
-sudo pacman -S adwaita-cursors
-
-# Pywal for dynamic colors (optional but recommended)
-sudo pacman -S python-pywal
-
-# Install rust/cargo if you don't have it (needed for Caelestia)
-sudo pacman -S rust
+# Install all required packages in one command
+sudo pacman -S hyprland hyprlock hyprshot wlogout kitty waybar swaybg waypaper wofi nautilus wireplumber pipewire-pulse brightnessctl playerctl adwaita-cursors python-pywal
 ```
 
-### Step 2: Install Optional Applications
-
-```bash
-# Applications referenced in config (adjust to your preference)
-sudo pacman -S telegram-desktop spotify code
-
-# AUR packages (requires yay or another AUR helper)
-yay -S google-chrome zen-browser-bin  # or your preferred browser
-```
-
-### Step 3: Install Caelestia Shell (Recommended)
+### Step 2: Install Caelestia Shell (Recommended)
 
 Caelestia is a modern shell with AI features that integrates with the pywal theming system.
 
@@ -91,16 +70,16 @@ caelestia shell -d &
 
 **Note:** Caelestia runs as a background service and integrates with pywal for dynamic color theming.
 
-### Step 4: Clone This Repository
+### Step 3: Clone This Repository
 
 ```bash
 # Clone to a temporary location
 cd ~/Downloads
-git clone https://github.com/yourusername/hyprduma-config.git
+git clone https://github.com/duma97/hyprduma-config.git
 cd hyprduma-config
 ```
 
-### Step 5: Backup Existing Configs (If Any)
+### Step 4: Backup Existing Configs (If Any)
 
 ```bash
 # Backup existing Hyprland config
@@ -113,7 +92,7 @@ cd hyprduma-config
 [ -d ~/.config/wlogout ] && mv ~/.config/wlogout ~/.config/wlogout.backup
 ```
 
-### Step 6: Install Hyprland Configuration
+### Step 5: Install Hyprland Configuration
 
 ```bash
 # Create Hypr config directory
@@ -123,15 +102,11 @@ mkdir -p ~/.config/hypr
 cp hyprland.conf ~/.config/hypr/
 cp hyprland-colors.conf ~/.config/hypr/
 
-# Copy wallpapers (optional, for use with waypaper)
-mkdir -p ~/.config/hypr/wallpapers
-cp wallpapers/* ~/.config/hypr/wallpapers/
-
 # Create screenshots directory (used by config)
 mkdir -p ~/Pictures/Screenshots
 ```
 
-### Step 7: Configure Your Applications
+### Step 6: Configure Your Applications
 
 **IMPORTANT:** Edit the config file to set your preferred applications.
 
@@ -149,7 +124,7 @@ nvim ~/.config/hypr/hyprland.conf
 # $browser = your-browser        # Your browser command
 ```
 
-### Step 8: Install Pywal Integration (Optional but Recommended)
+### Step 7: Install Pywal Integration (Strongly Recommended)
 
 Pywal provides dynamic color theming based on your wallpaper.
 
@@ -181,23 +156,7 @@ wal -i /path/to/your/wallpaper.png
 - Applies colors to Caelestia shell (if installed)
 - Restarts necessary services to apply changes
 
-### Step 9: Install Waybar Config (If You Have It)
-
-```bash
-# If you have waybar configs in this repo
-mkdir -p ~/.config/waybar
-cp -r waybar/* ~/.config/waybar/
-```
-
-### Step 10: Install Wlogout Config (If You Have It)
-
-```bash
-# If you have wlogout configs in this repo
-mkdir -p ~/.config/wlogout
-cp -r wlogout/* ~/.config/wlogout/
-```
-
-### Step 11: Start Hyprland
+### Step 8: Start Hyprland
 
 ```bash
 # If you're in a TTY, start Hyprland
@@ -205,18 +164,6 @@ Hyprland
 
 # If already in Hyprland, reload the config
 # Press SUPER + SHIFT + R (or restart Hyprland session)
-```
-
-### Step 12: Set Up Autostart for Caelestia (Optional)
-
-If you want Caelestia to start automatically with Hyprland:
-
-```bash
-# Edit your Hyprland config
-nvim ~/.config/hypr/hyprland.conf
-
-# Add this line in the Autostart section (around line 21-25):
-# exec-once = caelestia shell -d
 ```
 
 ---

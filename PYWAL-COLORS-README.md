@@ -6,7 +6,7 @@ This setup automatically applies pywal-generated colors to both Hyprland borders
 
 1. **`~/.config/wal/templates/hyprland-colors.conf`** - Template for Hyprland border colors
 2. **`~/.config/wal/templates/caelestia-scheme.json`** - Template for Caelestia color scheme
-3. **`~/.config/hypr/apply-pywal-colors.sh`** - Script to apply colors to both systems
+3. **`~/pywal.sh`** - Easy-to-use script to apply colors to both systems
 
 ## How It Works
 
@@ -25,8 +25,8 @@ Already done! Your Hyprland config now sources pywal colors automatically.
 # Generate colors from a wallpaper
 wal -i /path/to/your/wallpaper.png
 
-# Apply colors to Hyprland and Caelestia
-~/.config/hypr/apply-pywal-colors.sh
+# Apply colors to Hyprland and Caelestia (from anywhere!)
+~/pywal.sh
 ```
 
 ### Regenerate from Current Wallpaper
@@ -35,13 +35,13 @@ wal -i /path/to/your/wallpaper.png
 wal -R
 
 # Apply colors
-~/.config/hypr/apply-pywal-colors.sh
+~/pywal.sh
 ```
 
 ### Quick Apply
 ```bash
 # One-liner to generate and apply colors
-wal -i /path/to/wallpaper.png && ~/.config/hypr/apply-pywal-colors.sh
+wal -i /path/to/wallpaper.png && ~/pywal.sh
 ```
 
 ## What Gets Colored
@@ -72,7 +72,7 @@ After editing templates, run `wal -R` to regenerate colors.
 To automatically apply pywal colors on wallpaper change, you can add this to your autostart:
 ```bash
 # In your ~/.config/hypr/hyprland.conf
-exec-once = ~/.config/hypr/apply-pywal-colors.sh
+exec-once = ~/pywal.sh
 ```
 
 Or create a wallpaper script that calls pywal automatically.

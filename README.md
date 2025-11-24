@@ -212,6 +212,133 @@ wal -i ~/.config/hypr/wallpapers/sakura.jpg && ~/pywal.sh
 - This sync happens automatically on startup and when you open waypaper (Super+W)
 - For pywal integration, use `wal -i` as shown above, then run the apply script (which also syncs Caelestia)
 
+### System-Wide Theme Syncing (Dark/Light Mode)
+
+The enhanced `pywal.sh` script now supports system-wide theme synchronization, making browsers, GTK apps, and other applications respect PyWal color scheme and dark/light mode preference.
+
+#### Basic Usage
+
+```bash
+# Apply dark theme with wallpaper (default)
+~/.config/hypr/pywal.sh ~/Pictures/wallpaper.jpg
+
+# Apply light theme with wallpaper
+~/.config/hypr/pywal.sh ~/Pictures/wallpaper.jpg light
+
+# Switch to light mode (keep current wallpaper)
+~/.config/hypr/pywal.sh "" light
+
+# Switch to dark mode (keep current wallpaper)
+~/.config/hypr/pywal.sh "" dark
+
+# Refresh themes (reapply current colors)
+~/.config/hypr/pywal.sh
+```
+
+#### Enhanced System-Wide Support (Optional)
+
+For full system-wide theming across all applications, install these optional packages:
+
+**1. GTK Theme Support**
+
+```bash
+# Install GTK theme generator
+yay -S wal-gtk-theme-git
+
+# The script will automatically generate GTK themes
+# GTK apps (Nautilus, GNOME apps, etc.) will use PyWal colors
+```
+
+**2. Firefox Theme Support**
+
+```bash
+# Install pywalfox backend
+yay -S python-pywalfox
+pywalfox install
+
+# Then install the Pywalfox extension from Firefox Add-ons:
+# https://addons.mozilla.org/en-US/firefox/addon/pywalfox/
+```
+
+**3. Qt Application Support (Optional)**
+
+```bash
+# Install Qt theming tools
+yay -S qt5ct qt6ct kvantum
+
+# Set environment variables
+echo "QT_QPA_PLATFORMTHEME=qt5ct" >> ~/.config/environment.d/qt.conf
+echo "QT_STYLE_OVERRIDE=kvantum" >> ~/.config/environment.d/qt.conf
+```
+
+**4. Create GTK Configuration Files**
+
+```bash
+# Create GTK 3 settings
+mkdir -p ~/.config/gtk-3.0
+cat > ~/.config/gtk-3.0/settings.ini << 'EOF'
+[Settings]
+gtk-theme-name=FlatColor
+gtk-icon-theme-name=Papirus-Dark
+gtk-font-name=Sans 10
+gtk-cursor-theme-name=Adwaita
+gtk-cursor-theme-size=24
+gtk-application-prefer-dark-theme=1
+EOF
+
+# Create GTK 4 settings (same content)
+mkdir -p ~/.config/gtk-4.0
+cp ~/.config/gtk-3.0/settings.ini ~/.config/gtk-4.0/
+```
+
+#### What Gets Themed
+
+Once configured, the following applications will sync with your PyWal colors:
+
+- **Hyprland**: Window borders and decorations
+- **Caelestia Shell**: Status bar and UI elements
+- **Kitty Terminal**: Background, foreground, and color palette
+- **GTK Applications**: File managers (Nautilus), settings, GNOME apps
+- **Firefox**: Browser UI via Pywalfox (if installed)
+- **Chrome/Chromium**: Via system dark mode preference
+- **Qt Applications**: Via qt5ct/qt6ct (if configured)
+- **Bash Shell**: Terminal color sequences
+
+#### Automatic Dark/Light Mode by Time (Optional)
+
+Create a script to automatically switch themes based on time of day:
+
+```bash
+# Create auto-theme script
+cat > ~/.local/bin/auto-theme.sh << 'EOF'
+#!/bin/bash
+HOUR=$(date +%H)
+
+if [ $HOUR -ge 18 ] || [ $HOUR -lt 6 ]; then
+    # Dark mode (6 PM to 6 AM)
+    ~/.config/hypr/pywal.sh "" dark
+else
+    # Light mode (6 AM to 6 PM)
+    ~/.config/hypr/pywal.sh "" light
+fi
+EOF
+
+chmod +x ~/.local/bin/auto-theme.sh
+
+# Add to Hyprland config to run on startup
+echo "exec-once = ~/.local/bin/auto-theme.sh" >> ~/.config/hypr/hyprland.conf
+```
+
+#### How It Works
+
+The enhanced `pywal.sh` script:
+1. Generates PyWal colors from wallpaper (or switches theme mode)
+2. Creates GTK themes via `wal-gtk` (if installed)
+3. Sets system-wide dark/light preference via `gsettings`
+4. Updates Firefox theme via `pywalfox` (if installed)
+5. Reloads Hyprland, Caelestia, and Kitty with new colors
+6. Automatically detects if theme is light or dark based on background brightness
+
 ### Monitor Configuration
 
 If you have different monitors, adjust lines 4-18 in `~/.config/hypr/hyprland.conf`:

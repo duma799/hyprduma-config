@@ -129,7 +129,7 @@ nvim ~/.config/hypr/hyprland.conf
 Pywal provides dynamic color theming based on your wallpaper.
 
 ```bash
-# Install pywal templates
+# Install pywal templates (REQUIRED for color generation)
 mkdir -p ~/.config/wal/templates
 cp -r wal/templates/* ~/.config/wal/templates/
 
@@ -143,17 +143,40 @@ chmod +x ~/.config/hypr/sync-caelestia-wallpaper.sh
 cp pywal.sh ~/pywal.sh
 chmod +x ~/pywal.sh
 
-# Test pywal with a wallpaper
+# Setup Kitty terminal to use pywal colors
+mkdir -p ~/.config/kitty
+cp kitty/kitty.conf ~/.config/kitty/
+
+# Configure bash shell to load pywal colors
+# Add these lines to your ~/.bashrc if they're not already there:
+cat >> ~/.bashrc << 'EOF'
+
+# Import pywal colorscheme from cache
+(cat ~/.cache/wal/sequences &)
+
+# To add support for TTYs (optional)
+source ~/.cache/wal/colors-tty.sh 2>/dev/null
+EOF
+
+# Generate initial colors from a wallpaper
 wal -i /path/to/your/wallpaper.png
 
-# Apply colors to Hyprland and Caelestia (from anywhere)
+# Or use included wallpaper
+wal -i wallpapers/sakura.jpg
+
+# Apply colors to all components
 ~/pywal.sh
+
+# Reload bash to apply shell colors
+source ~/.bashrc
 ```
 
 **What this does:**
 - Generates a color scheme from your wallpaper
 - Applies colors to Hyprland window borders
 - Applies colors to Caelestia shell (if installed)
+- Applies colors to Kitty terminals
+- Applies colors to bash shell
 - Restarts necessary services to apply changes
 
 ### Step 8: Start Hyprland
@@ -229,6 +252,66 @@ kb_layout = us, ru  # Change to your layouts
 - Check if the applications are actually installed
 
 ### Pywal colors not applying
+
+**If colors work in Hyprland but not in terminals/shell:**
+
+1. **Check if templates are installed:**
+   ```bash
+   ls ~/.config/wal/templates/
+   # Should show: hyprland-colors.conf, caelestia-scheme.json
+   ```
+
+   If missing, copy them:
+   ```bash
+   mkdir -p ~/.config/wal/templates
+   cp ~/.config/hypr/wal/templates/* ~/.config/wal/templates/
+   ```
+
+2. **Regenerate colors:**
+   ```bash
+   wal -R && ~/pywal.sh
+   ```
+
+3. **Check bash configuration:**
+   ```bash
+   grep -A 5 "pywal" ~/.bashrc
+   ```
+
+   If missing, add:
+   ```bash
+   cat >> ~/.bashrc << 'EOF'
+
+   # Import pywal colorscheme from cache
+   (cat ~/.cache/wal/sequences &)
+
+   # To add support for TTYs (optional)
+   source ~/.cache/wal/colors-tty.sh 2>/dev/null
+   EOF
+
+   source ~/.bashrc
+   ```
+
+4. **Check Kitty configuration:**
+   ```bash
+   grep "colors-kitty" ~/.config/kitty/kitty.conf
+   ```
+
+   Should show: `include ~/.cache/wal/colors-kitty.conf`
+
+   If it shows `kitty-colors.conf` (wrong filename), fix it:
+   ```bash
+   sed -i 's/kitty-colors.conf/colors-kitty.conf/g' ~/.config/kitty/kitty.conf
+   killall -SIGUSR1 kitty  # Reload kitty
+   ```
+
+5. **Verify pywal cache files exist:**
+   ```bash
+   ls ~/.cache/wal/hyprland-colors.conf
+   ls ~/.cache/wal/colors-kitty.conf
+   ls ~/.cache/wal/sequences
+   ```
+
+**General pywal troubleshooting:**
 - Ensure the script is executable: `chmod +x ~/pywal.sh`
 - Check if pywal cache exists: `ls ~/.cache/wal/`
 - Manually reload: `~/pywal.sh`

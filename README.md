@@ -1,6 +1,6 @@
 # HyprDuma Dotfiles
 
-<video src="hyprland.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/17ff7195-82e0-4b48-9309-1a5ec9d6e5a4
 
 Personal Hyprland configuration focused on productivity and ergonomics.
 

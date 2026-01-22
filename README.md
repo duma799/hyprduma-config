@@ -1,5 +1,7 @@
 # HyprDuma Dotfiles
 
+<video src="hyprland.mp4" controls width="100%"></video>
+
 Personal Hyprland configuration focused on productivity and ergonomics.
 
 ## Features

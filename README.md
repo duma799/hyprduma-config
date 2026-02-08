@@ -28,7 +28,16 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 
 ---
 
-## Complete Installation Guide
+## Quick Install
+
+```bash
+git clone https://github.com/duma799/hyprduma-config.git ~/Downloads/hyprduma-config
+python3 ~/Downloads/hyprduma-config/install.py
+```
+
+---
+
+## Complete Installation Guide (Manual)
 
 Follow these steps in order to install the complete setup from scratch.
 
@@ -77,7 +86,7 @@ caelestia shell -d &
 ```bash
 # Clone to a temporary location
 cd ~/Downloads
-git clone https://github.com/duma97/hyprduma-config.git
+git clone https://github.com/duma799/hyprduma-config.git
 cd hyprduma-config
 ```
 

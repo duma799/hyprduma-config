@@ -31,6 +31,11 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ## Quick Install
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/duma799/hyprduma-config/master/install.sh | bash
+```
+
+Or manually:
+```bash
 git clone https://github.com/duma799/hyprduma-config.git ~/Downloads/hyprduma-config
 python3 ~/Downloads/hyprduma-config/install.py
 ```

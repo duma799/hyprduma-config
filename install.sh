@@ -1,6 +1,4 @@
 #!/bin/bash
-# HyprDuma Config - Quick Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/duma799/hyprduma-config/master/install.sh | bash
 
 set -e
 
@@ -24,6 +22,4 @@ git clone --depth 1 "$REPO" "$TMPDIR/hyprduma-config" 2>/dev/null
 
 echo -e "\033[36m=> Launching installer...\033[0m\n"
 
-# </dev/tty reconnects stdin to the terminal so interactive prompts work
-# even when this script is piped from curl
 python3 "$TMPDIR/hyprduma-config/install.py" </dev/tty

@@ -4,6 +4,7 @@
 import os
 import socket
 import subprocess
+import sys
 import time
 
 def get_socket_path():
@@ -24,11 +25,7 @@ def handle_reload():
         time.sleep(1)
         subprocess.Popen(["caelestia", "shell", "-d"])
 
-def main():
-    path = get_socket_path()
-    if not path:
-        return
-
+def listen(path):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.connect(path)
     buf = ""
@@ -42,6 +39,30 @@ def main():
             line, buf = buf.split("\n", 1)
             if line.startswith("configreloaded"):
                 handle_reload()
+
+    sock.close()
+
+def main():
+    path = get_socket_path()
+    if not path:
+        print("monitor-handler: HYPRLAND_INSTANCE_SIGNATURE not set", file=sys.stderr)
+        return
+
+    while True:
+        try:
+            listen(path)
+        except (ConnectionRefusedError, FileNotFoundError):
+            pass
+        except Exception as e:
+            print(f"monitor-handler: {e}", file=sys.stderr)
+
+        # Socket closed or errored — wait and retry
+        time.sleep(2)
+
+        # Re-check socket path in case Hyprland restarted with new signature
+        new_path = get_socket_path()
+        if new_path:
+            path = new_path
 
 if __name__ == "__main__":
     main()

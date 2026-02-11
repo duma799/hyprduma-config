@@ -16,4 +16,3 @@ require("vim-options")
 -- Load pywal colors early
 pcall(function() vim.cmd("source ~/.cache/wal/colors-wal.vim") end)
 require("lazy").setup("plugins")
-vim.opt.termguicolors = true

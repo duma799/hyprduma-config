@@ -11,9 +11,10 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 
 ### Visual & UX
 - Minimal gaps (10px/40px) for space efficiency
-- Blur effects and transparency
+- Transparency with configurable opacity (active: 0.985, inactive: 0.85)
 - Smooth custom animations with bezier curves
-- **Pywal integration** - Dynamic colors from wallpaper (optional)
+- **Pywal integration** - Dynamic system-wide colors from wallpaper
+- **Caelestia shell** integration for dynamic theming and AI features
 
 ### Input
 - 3-finger gestures (horizontal: workspace, vertical: fullscreen)
@@ -22,9 +23,15 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 - Optimized touchpad scrolling
 
 ### Display Setup
-- Dual monitor configuration (HDMI-A-1 flipped + eDP-1)
-- Workspaces 1-4 on external monitor
-- Workspaces 5-10 on laptop screen
+- Auto-detected monitor configuration (works with any setup out of the box)
+- Workspaces 1-4 on external monitor, 5-10 on laptop screen
+- **Monitor handler** - automatically restores wallpaper and Caelestia shell after config reload
+
+### Automation
+- **Auto-installer** - interactive Python installer handles the entire setup
+- **Waypaper hook** - pywal colors auto-apply when wallpaper changes via waypaper GUI
+- **Monitor handler** - listens for Hyprland config reloads and restarts swaybg/Caelestia
+- **Fastfetch config** - custom system info display with ASCII art
 
 ---
 
@@ -40,131 +47,104 @@ git clone https://github.com/duma799/hyprduma-config.git ~/Downloads/hyprduma-co
 python3 ~/Downloads/hyprduma-config/install.py
 ```
 
+The interactive installer handles everything:
+1. AUR helpers (yay/paru)
+2. Required packages via pacman
+3. Caelestia shell
+4. Config backup and installation
+5. Pywal integration (templates, scripts, bashrc, initial colors)
+6. Waypaper hook for automatic color application
+7. Monitor handler for config reload resilience
+8. Fastfetch config with custom ASCII art
+
 ---
 
-## Complete Installation Guide (Manual)
+## Manual Installation Guide
 
-Follow these steps in order to install the complete setup from scratch.
+If you prefer to install manually instead of using the auto-installer, follow these steps.
 
 ### Prerequisites: Install AUR Helpers (Optional but Recommended)
-
-If you don't have yay and paru installed yet, you can install both:
 
 ```bash
 # Install yay
 sudo pacman -S --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si
-cd .. && rm -rf yay
+cd yay && makepkg -si && cd .. && rm -rf yay
 
 # Install paru
 git clone https://aur.archlinux.org/paru.git
-cd paru
-makepkg -si
-cd .. && rm -rf paru
+cd paru && makepkg -si && cd .. && rm -rf paru
 ```
 
 ### Step 1: Install Required Packages
 
 ```bash
-# Install all required packages in one command
-sudo pacman -S hyprland hyprlock hyprshot wlogout kitty waybar swaybg waypaper wofi nautilus wireplumber pipewire-pulse brightnessctl playerctl adwaita-cursors python-pywal
+sudo pacman -S hyprland hyprlock hyprshot wlogout kitty waybar swaybg waypaper wofi nautilus wireplumber pipewire-pulse brightnessctl playerctl adwaita-cursors python-pywal fastfetch
 ```
 
 ### Step 2: Install Caelestia Shell (Recommended)
 
-Caelestia is a modern shell with AI features that integrates with the pywal theming system.
-
 ```bash
-# Install Caelestia via yay
-yay -S caelestia-shell # caelestia-shell-git is bleeding edge & unstable one
-
-# Start Caelestia daemon (it will auto-restart when pywal colors change)
-caelestia shell -d &
+yay -S caelestia-shell
 ```
 
-**Note:** Caelestia runs as a background service and integrates with pywal for dynamic color theming.
-
-### Step 3: Clone This Repository
+### Step 3: Clone and Install Config
 
 ```bash
-# Clone to a temporary location
 cd ~/Downloads
 git clone https://github.com/duma799/hyprduma-config.git
 cd hyprduma-config
-```
 
-### Step 4: Backup Existing Configs (If Any)
-
-```bash
-# Backup existing Hyprland config
+# Backup existing configs
 [ -d ~/.config/hypr ] && mv ~/.config/hypr ~/.config/hypr.backup
-
-# Backup existing waybar config
 [ -d ~/.config/waybar ] && mv ~/.config/waybar ~/.config/waybar.backup
-
-# Backup existing wlogout config
 [ -d ~/.config/wlogout ] && mv ~/.config/wlogout ~/.config/wlogout.backup
-```
 
-### Step 5: Install Hyprland Configuration
-
-```bash
-# Create Hypr config directory
+# Install Hyprland config
 mkdir -p ~/.config/hypr
-
-# Copy main config
 cp hyprland.conf ~/.config/hypr/
-cp hyprland-colors.conf ~/.config/hypr/
-
-# Create screenshots directory (used by config)
+cp -r wallpapers ~/.config/hypr/
 mkdir -p ~/Pictures/Screenshots
 ```
 
-### Step 6: Configure Your Applications
-
-**IMPORTANT:** Edit the config file to set your preferred applications.
+### Step 4: Install Scripts
 
 ```bash
-# Open the config file
-nvim ~/.config/hypr/hyprland.conf
+# Copy all scripts
+cp pywal.sh sync-caelestia-wallpaper.sh waypaper-hook.sh ~/.config/hypr/
+cp monitor-handler.py ~/.config/hypr/
+chmod +x ~/.config/hypr/pywal.sh ~/.config/hypr/sync-caelestia-wallpaper.sh ~/.config/hypr/waypaper-hook.sh
 
-# Find lines 27-34 and adjust these variables:
-# $terminal = kitty              # Your terminal
-# $fileManager = dolphin         # Your file manager
-# $menu = wofi --show drun       # Your app launcher
-# $telegram = Telegram           # Path to Telegram
-# $spotify = spotify             # Path to Spotify
-# $vscode = code                 # Path to VSCode
-# $browser = your-browser        # Your browser command
+# Copy pywal.sh to home for convenience
+cp pywal.sh ~/pywal.sh && chmod +x ~/pywal.sh
 ```
 
-### Step 7: Install Pywal Integration (Strongly Recommended)
+### Step 5: Configure Your Applications
 
-Pywal provides dynamic color theming based on your wallpaper.
+Edit `~/.config/hypr/hyprland.conf` and adjust the app variables (lines 28-34):
+
+```
+$terminal = kitty
+$fileManager = nautilus
+$menu = wofi --show drun
+$telegram = Telegram
+$spotify = spotify
+$vscode = code
+$browser = your-browser
+```
+
+### Step 6: Install Pywal Integration
 
 ```bash
-# Install pywal templates (REQUIRED for color generation)
+# Install pywal templates
 mkdir -p ~/.config/wal/templates
 cp -r wal/templates/* ~/.config/wal/templates/
 
-# Copy the color application and wallpaper sync scripts
-cp pywal.sh ~/.config/hypr/
-cp sync-caelestia-wallpaper.sh ~/.config/hypr/
-chmod +x ~/.config/hypr/pywal.sh
-chmod +x ~/.config/hypr/sync-caelestia-wallpaper.sh
-
-# Also copy to home directory for easier access
-cp pywal.sh ~/pywal.sh
-chmod +x ~/pywal.sh
-
-# Setup Kitty terminal to use pywal colors
+# Setup Kitty terminal
 mkdir -p ~/.config/kitty
 cp kitty/kitty.conf ~/.config/kitty/
 
-# Configure bash shell to load pywal colors
-# Add these lines to your ~/.bashrc if they're not already there:
+# Add pywal to bashrc
 cat >> ~/.bashrc << 'EOF'
 
 # Import pywal colorscheme from cache
@@ -174,208 +154,124 @@ cat >> ~/.bashrc << 'EOF'
 source ~/.cache/wal/colors-tty.sh 2>/dev/null
 EOF
 
-# Generate initial colors from a wallpaper
-wal -i /path/to/your/wallpaper.png
-
-# Or use included wallpaper
-wal -i wallpapers/sakura.jpg
-
-# Apply colors to all components
-~/pywal.sh
-
-# Reload bash to apply shell colors
+# Generate initial colors
+wal -i wallpapers/sakura.jpg && ~/pywal.sh
 source ~/.bashrc
 ```
 
-**What this does:**
-- Generates a color scheme from your wallpaper
-- Applies colors to Hyprland window borders
-- Applies colors to Caelestia shell (if installed)
-- Applies colors to Kitty terminals
-- Applies colors to bash shell
-- Restarts necessary services to apply changes
+### Step 7: Configure Waypaper Hook
 
-### Step 8: Start Hyprland
+The waypaper hook automatically applies pywal colors whenever you change wallpaper through the waypaper GUI.
 
 ```bash
-# If you're in a TTY, start Hyprland
+# Set waypaper-hook.sh as waypaper's post_command
+mkdir -p ~/.config/waypaper
+# Add to ~/.config/waypaper/config.ini under [Settings]:
+# post_command = /home/YOUR_USER/.config/hypr/waypaper-hook.sh
+```
+
+### Step 8: Install Fastfetch Config (Optional)
+
+```bash
+cp -r fastfetch ~/.config/fastfetch
+
+# Fix hardcoded paths for your user
+sed -i "s|/home/duma/|$HOME/|g" ~/.config/fastfetch/config.jsonc
+```
+
+### Step 9: Start Hyprland
+
+```bash
+# From TTY
 Hyprland
 
-# If already in Hyprland, reload the config
-# Press SUPER + SHIFT + R (or restart Hyprland session)
+# Or if already running, reload config
+# Press SUPER + SHIFT + R
 ```
 
 ---
 
 ## Post-Installation
 
-### Setting Wallpaper with Pywal
+### Setting Wallpaper
 
+**Using waypaper GUI (recommended):**
+- Press `Super+W` to open waypaper
+- Select a wallpaper - the **waypaper hook** automatically runs pywal and syncs colors to all components (Hyprland, Caelestia, Kitty, GTK, Firefox)
+
+**Using command line:**
 ```bash
-# Generate colors and apply them
 wal -i /path/to/wallpaper.png && ~/pywal.sh
-
-# Or use the wallpapers included in this repo
-wal -i ~/.config/hypr/wallpapers/sakura.jpg && ~/pywal.sh
 ```
 
-**Note about waypaper and Caelestia:**
-- This config uses **swaybg** as the wallpaper backend (not hyprpaper)
-- Use `waypaper` GUI (Super+W) to select wallpapers
-- Waypaper with swaybg backend automatically saves and restores your wallpaper on login
-- **Important**: Caelestia shell has its own wallpaper management that may conflict with waypaper
-- The config includes `sync-caelestia-wallpaper.sh` to automatically sync Caelestia's wallpaper reference with swaybg
-- This sync happens automatically on startup and when you open waypaper (Super+W)
-- For pywal integration, use `wal -i` as shown above, then run the apply script (which also syncs Caelestia)
+**How wallpaper management works:**
+- **swaybg** is the wallpaper backend (not hyprpaper)
+- **waypaper** GUI sets the wallpaper and triggers `waypaper-hook.sh` as a post-command
+- The hook runs pywal, syncs Caelestia colors/wallpaper, reloads Hyprland, and updates GTK/Firefox themes
+- **sync-caelestia-wallpaper.sh** syncs Caelestia's wallpaper reference with swaybg on startup
+- **monitor-handler.py** listens for config reloads and restores swaybg/Caelestia if they get killed
 
-### System-Wide Theme Syncing (Dark/Light Mode)
+### System-Wide Theme Syncing
 
-The enhanced `pywal.sh` script now supports system-wide theme synchronization, making browsers, GTK apps, and other applications respect PyWal color scheme and dark/light mode preference.
-
-#### Basic Usage
+The `pywal.sh` script supports dark/light mode and system-wide theme synchronization (GTK, Firefox, Qt). See **[PYWAL-SETUP.md](PYWAL-SETUP.md)** for the full guide including optional enhancements, light/dark theme switching, and backend options.
 
 ```bash
-# Apply dark theme with wallpaper (default)
-~/.config/hypr/pywal.sh ~/Pictures/wallpaper.jpg
-
-# Apply light theme with wallpaper
-~/.config/hypr/pywal.sh ~/Pictures/wallpaper.jpg light
-
-# Switch to light mode (keep current wallpaper)
-~/.config/hypr/pywal.sh "" light
-
-# Switch to dark mode (keep current wallpaper)
-~/.config/hypr/pywal.sh "" dark
-
-# Refresh themes (reapply current colors)
-~/.config/hypr/pywal.sh
+~/pywal.sh ~/Pictures/wallpaper.jpg          # Dark theme (default)
+~/pywal.sh ~/Pictures/wallpaper.jpg light    # Light theme
+~/pywal.sh "" dark                            # Switch mode, keep wallpaper
+~/pywal.sh                                    # Refresh current theme
 ```
-
-#### Enhanced System-Wide Support (Optional)
-
-For full system-wide theming across all applications, install these optional packages:
-
-**1. GTK Theme Support**
-
-```bash
-# Install GTK theme generator
-yay -S wal-gtk-theme-git
-
-# The script will automatically generate GTK themes
-# GTK apps (Nautilus, GNOME apps, etc.) will use PyWal colors
-```
-
-**2. Firefox Theme Support**
-
-```bash
-# Install pywalfox backend
-yay -S python-pywalfox
-pywalfox install
-
-# Then install the Pywalfox extension from Firefox Add-ons:
-# https://addons.mozilla.org/en-US/firefox/addon/pywalfox/
-```
-
-**3. Qt Application Support (Optional)**
-
-```bash
-# Install Qt theming tools
-yay -S qt5ct qt6ct kvantum
-
-# Set environment variables
-echo "QT_QPA_PLATFORMTHEME=qt5ct" >> ~/.config/environment.d/qt.conf
-echo "QT_STYLE_OVERRIDE=kvantum" >> ~/.config/environment.d/qt.conf
-```
-
-**4. Create GTK Configuration Files**
-
-```bash
-# Create GTK 3 settings
-mkdir -p ~/.config/gtk-3.0
-cat > ~/.config/gtk-3.0/settings.ini << 'EOF'
-[Settings]
-gtk-theme-name=FlatColor
-gtk-icon-theme-name=Papirus-Dark
-gtk-font-name=Sans 10
-gtk-cursor-theme-name=Adwaita
-gtk-cursor-theme-size=24
-gtk-application-prefer-dark-theme=1
-EOF
-
-# Create GTK 4 settings (same content)
-mkdir -p ~/.config/gtk-4.0
-cp ~/.config/gtk-3.0/settings.ini ~/.config/gtk-4.0/
-```
-
-#### What Gets Themed
-
-Once configured, the following applications will sync with your PyWal colors:
-
-- **Hyprland**: Window borders and decorations
-- **Caelestia Shell**: Status bar and UI elements
-- **Kitty Terminal**: Background, foreground, and color palette
-- **GTK Applications**: File managers (Nautilus), settings, GNOME apps
-- **Firefox**: Browser UI via Pywalfox (if installed)
-- **Chrome/Chromium**: Via system dark mode preference
-- **Qt Applications**: Via qt5ct/qt6ct (if configured)
-- **Bash Shell**: Terminal color sequences
-
-#### Automatic Dark/Light Mode by Time (Optional)
-
-Create a script to automatically switch themes based on time of day:
-
-```bash
-# Create auto-theme script
-cat > ~/.local/bin/auto-theme.sh << 'EOF'
-#!/bin/bash
-HOUR=$(date +%H)
-
-if [ $HOUR -ge 18 ] || [ $HOUR -lt 6 ]; then
-    # Dark mode (6 PM to 6 AM)
-    ~/.config/hypr/pywal.sh "" dark
-else
-    # Light mode (6 AM to 6 PM)
-    ~/.config/hypr/pywal.sh "" light
-fi
-EOF
-
-chmod +x ~/.local/bin/auto-theme.sh
-
-# Add to Hyprland config to run on startup
-echo "exec-once = ~/.local/bin/auto-theme.sh" >> ~/.config/hypr/hyprland.conf
-```
-
-#### How It Works
-
-The enhanced `pywal.sh` script:
-1. Generates PyWal colors from wallpaper (or switches theme mode)
-2. Creates GTK themes via `wal-gtk` (if installed)
-3. Sets system-wide dark/light preference via `gsettings`
-4. Updates Firefox theme via `pywalfox` (if installed)
-5. Reloads Hyprland, Caelestia, and Kitty with new colors
-6. Automatically detects if theme is light or dark based on background brightness
 
 ### Monitor Configuration
 
-If you have different monitors, adjust lines 4-18 in `~/.config/hypr/hyprland.conf`:
+The default config uses auto-detection which works with any monitor setup:
+
+```
+monitor = , preferred, auto, 1
+```
+
+To customize for specific monitors, edit `~/.config/hypr/hyprland.conf` (line 4):
 
 ```bash
-nvim ~/.config/hypr/hyprland.conf
-
-# Edit monitor configuration:
-# monitor = eDP-1, 1920x1080@144, 1920x0, 1
-# monitor = HDMI-A-1, 1920x1080@144, 0x0, 1, transform, 2
+# Example: dual monitor with specific resolution
+monitor = eDP-1, 1920x1080@144, 1920x0, 1
+monitor = HDMI-A-1, 1920x1080@144, 0x0, 1, transform, 2
 ```
+
+Workspace assignment (lines 7-17) distributes workspaces 1-4 to the external monitor and 5-10 to the laptop screen.
+
+### Monitor Handler
+
+The `monitor-handler.py` script runs in the background and listens for Hyprland config reloads. When a reload is detected, it checks if swaybg and Caelestia are still running, and restarts them if needed. This prevents losing your wallpaper or shell after editing the config.
 
 ### Keyboard Layout
 
-Default is US/RU with ALT+SHIFT toggle. To change, edit `~/.config/hypr/hyprland.conf` line 42:
+Default is US/RU with ALT+SHIFT toggle. To change, edit the input section in `~/.config/hypr/hyprland.conf`:
 
 ```
 kb_layout = us, ru  # Change to your layouts
 ```
 
 ---
+
+## Project Structure
+
+```
+hyprduma-config/
+├── hyprland.conf              # Main Hyprland configuration
+├── pywal.sh                   # Apply pywal colors to all components
+├── waypaper-hook.sh           # Auto-apply colors on wallpaper change
+├── sync-caelestia-wallpaper.sh # Sync swaybg wallpaper to Caelestia
+├── monitor-handler.py         # Restart wallpaper/shell after config reload
+├── install.py                 # Interactive auto-installer
+├── install.sh                 # Curl one-liner bootstrap script
+├── wallpapers/                # Included wallpapers
+├── wal/templates/             # Pywal templates for Hyprland & Caelestia
+├── kitty/kitty.conf           # Kitty terminal config with pywal support
+├── fastfetch/                 # Custom fastfetch config with ASCII art
+├── KEYBINDS.md                # Complete keybindings reference
+└── PYWAL-SETUP.md             # Detailed pywal integration guide
+```
 
 ## Documentation
 
@@ -391,7 +287,7 @@ kb_layout = us, ru  # Change to your layouts
 - Review error logs: `journalctl -b | grep hyprland`
 
 ### Applications don't launch
-- Make sure you edited the app variables in `hyprland.conf` (lines 27-34)
+- Make sure you edited the app variables in `hyprland.conf` (lines 28-34)
 - Check if the applications are actually installed
 
 ### Pywal colors not applying
@@ -465,13 +361,26 @@ kb_layout = us, ru  # Change to your layouts
 pkill caelestia && sleep 0.5 && caelestia shell -d &
 ```
 
-### Wallpaper not showing on startup
+### Wallpaper not showing after config reload
+The monitor handler should restore it automatically. If not:
 ```bash
-# Restore wallpaper with waypaper
-waypaper restore
+# Check if monitor-handler is running
+pgrep -f monitor-handler.py
 
-# Manually restart swaybg if needed
-pkill swaybg && swaybg &
+# Restart it if needed
+python3 ~/.config/hypr/monitor-handler.py &
+
+# Or manually restore
+waypaper --restore
+```
+
+### Waypaper hook not applying colors
+```bash
+# Check if hook is registered
+grep post_command ~/.config/waypaper/config.ini
+
+# Check hook logs
+cat /tmp/waypaper-hook.log
 ```
 
 ---

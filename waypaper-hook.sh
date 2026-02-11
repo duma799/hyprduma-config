@@ -31,41 +31,19 @@ fi
 if [ -f "$WALLPAPER" ]; then
     echo "Applying pywal for wallpaper: $WALLPAPER" >> "$LOG_FILE"
 
-    wal -i "$WALLPAPER" --backend wal -n -s -t >> "$LOG_FILE" 2>&1
+    # Resolve pywal.sh location (same directory as this hook, or ~/pywal.sh)
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    PYWAL_SCRIPT="$SCRIPT_DIR/pywal.sh"
+    if [ ! -f "$PYWAL_SCRIPT" ]; then
+        PYWAL_SCRIPT="$HOME/pywal.sh"
+    fi
 
-    (
-        if [ -f ~/.cache/wal/caelestia-scheme.json ]; then
-            mkdir -p ~/.local/state/caelestia
-            cp ~/.cache/wal/caelestia-scheme.json ~/.local/state/caelestia/scheme.json
-            mkdir -p ~/.local/state/caelestia/wallpaper
-            ln -sf "$WALLPAPER" ~/.local/state/caelestia/wallpaper/current
-            echo "$WALLPAPER" > ~/.local/state/caelestia/wallpaper/path.txt
-        fi
-
-        if pgrep -x "caelestia" > /dev/null; then
-            pkill caelestia
-            sleep 0.5
-            caelestia shell -d &
-        fi
-
-        hyprctl reload > /dev/null 2>&1
-
-        if pgrep -x "kitty" > /dev/null; then
-            killall -SIGUSR1 kitty 2>/dev/null
-        fi
-
-        if command -v wal-gtk &> /dev/null; then
-            wal-gtk >> "$LOG_FILE" 2>&1
-        fi
-
-        if command -v gsettings &> /dev/null; then
-            gsettings set org.gnome.desktop.interface color-scheme "prefer-dark" 2>/dev/null
-        fi
-
-        if command -v pywalfox &> /dev/null; then
-            pywalfox update &>/dev/null &
-        fi
-    ) >> "$LOG_FILE" 2>&1
+    if [ -f "$PYWAL_SCRIPT" ]; then
+        bash "$PYWAL_SCRIPT" "$WALLPAPER" >> "$LOG_FILE" 2>&1
+    else
+        echo "✗ pywal.sh not found" >> "$LOG_FILE"
+        exit 1
+    fi
 
     echo "✓ Waypaper hook completed at $(date)" >> "$LOG_FILE"
 else

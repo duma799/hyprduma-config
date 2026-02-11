@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import configparser
+import shlex
 import shutil
 import subprocess
 import sys
@@ -71,19 +72,19 @@ def ask_yn(prompt, default=True):
     return answer in ("y", "yes")
 
 
-def run(cmd, check=True, capture=False, **kwargs):
+def run(cmd, capture=False, check=True, **kwargs):
+    """Run a shell command. Returns stdout string if capture=True (None on failure),
+    or bool success if capture=False."""
+    result = subprocess.run(
+        cmd, shell=True, capture_output=capture, text=capture, **kwargs
+    )
     if capture:
-        result = subprocess.run(
-            cmd, shell=True, capture_output=True, text=True, **kwargs
-        )
         if check and result.returncode != 0:
             return None
         return result.stdout.strip()
-    else:
-        result = subprocess.run(cmd, shell=True, **kwargs)
-        if check and result.returncode != 0:
-            return False
+    if check:
         return result.returncode == 0
+    return True
 
 
 def cmd_exists(name):
@@ -380,12 +381,12 @@ def install_pywal(repo):
 
     if wallpaper.exists() and cmd_exists("wal"):
         print_info(f"Generating pywal colors from {wallpaper.name}...")
-        run(f'wal -i "{wallpaper}"')
+        run(f'wal -i {shlex.quote(str(wallpaper))}')
         print_ok("Generated initial pywal color scheme")
 
         pywal_script = home / "pywal.sh"
         if pywal_script.exists():
-            if run(f'bash "{pywal_script}"'):
+            if run(f'bash {shlex.quote(str(pywal_script))}'):
                 print_ok("Applied pywal colors to all components")
             else:
                 print_warn("pywal.sh had errors (normal if Hyprland isn't running yet)")

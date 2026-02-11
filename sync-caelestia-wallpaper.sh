@@ -1,7 +1,6 @@
 #!/bin/bash
-# Sync Caelestia's wallpaper reference with the currently running swaybg wallpaper
+# Sync Caelestia wallpaper with swaybg
 
-# Get the wallpaper path from running swaybg process
 WALLPAPER_PATH=$(pgrep -a swaybg | grep -oP '(?<=-i )[^ ]+' | head -1)
 
 if [ -n "$WALLPAPER_PATH" ] && [ -f "$WALLPAPER_PATH" ]; then

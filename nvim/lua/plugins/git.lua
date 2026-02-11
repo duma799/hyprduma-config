@@ -1,5 +1,5 @@
 return {
-    "lewis6991/gitsigns.nvim",  -- Add a comma here
+    "lewis6991/gitsigns.nvim",
     config = function()
         require('gitsigns').setup {
             signs = {

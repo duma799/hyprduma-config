@@ -1,7 +1,0 @@
-name: Refresh
-on: workflow_dispatch
-jobs:
-  refresh:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Refreshing contributor cache"

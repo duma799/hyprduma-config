@@ -5,6 +5,7 @@ Automates the complete installation of HyprDuma dotfiles.
 Run: python3 install.py
 """
 
+import configparser
 import subprocess
 import sys
 import shutil
@@ -26,7 +27,7 @@ PACMAN_PACKAGES = [
     "hyprland", "hyprlock", "hyprshot", "wlogout", "kitty", "waybar",
     "swaybg", "waypaper", "wofi", "nautilus", "wireplumber",
     "pipewire-pulse", "brightnessctl", "playerctl", "adwaita-cursors",
-    "python-pywal",
+    "python-pywal", "fastfetch",
 ]
 
 
@@ -163,23 +164,39 @@ def install_packages():
 
 def install_caelestia():
     """Step: Install Caelestia Shell (optional)."""
-    if cmd_exists("caelestia"):
+    already_installed = cmd_exists("caelestia")
+
+    if already_installed:
         print_ok("Caelestia shell is already installed")
-        return
-
-    if not cmd_exists("yay") and not cmd_exists("paru"):
-        print_warn("No AUR helper found - skipping Caelestia (install manually: yay -S caelestia-shell)")
-        return
-
-    if not ask_yn("Install Caelestia Shell (recommended for dynamic theming)?"):
-        print_warn("Skipping Caelestia shell")
-        return
-
-    helper = "yay" if cmd_exists("yay") else "paru"
-    if run(f"{helper} -S --noconfirm caelestia-shell"):
-        print_ok("Caelestia shell installed")
     else:
-        print_err("Failed to install Caelestia - you can try manually: yay -S caelestia-shell")
+        if not cmd_exists("yay") and not cmd_exists("paru"):
+            print_warn("No AUR helper found - skipping Caelestia (install manually: yay -S caelestia-shell)")
+            return
+
+        if not ask_yn("Install Caelestia Shell (recommended for dynamic theming)?"):
+            print_warn("Skipping Caelestia shell")
+            return
+
+        helper = "yay" if cmd_exists("yay") else "paru"
+        if run(f"{helper} -S --noconfirm caelestia-shell"):
+            print_ok("Caelestia shell installed")
+        else:
+            print_err("Failed to install Caelestia - you can try manually: yay -S caelestia-shell")
+            return
+
+    # Pre-create state directories so caelestia shell starts cleanly
+    state_dir = Path.home() / ".local" / "state" / "caelestia"
+    wallpaper_dir = state_dir / "wallpaper"
+    wallpaper_dir.mkdir(parents=True, exist_ok=True)
+    print_ok("Created Caelestia state directories (~/.local/state/caelestia/)")
+
+    # Launch caelestia shell if Hyprland is running
+    if run("pgrep -x Hyprland", capture=True) is not None:
+        print_info("Hyprland detected, launching Caelestia shell...")
+        run("caelestia shell -d &", check=False)
+        print_ok("Caelestia shell launched")
+    else:
+        print_info("Caelestia will start automatically on next Hyprland session")
 
 
 def clone_repo():
@@ -214,7 +231,7 @@ def backup_configs():
     config = Path.home() / ".config"
     backed_up = []
 
-    for name in ["hypr", "waybar", "wlogout"]:
+    for name in ["hypr", "waybar", "wlogout", "waypaper"]:
         src = config / name
         dst = config / f"{name}.backup"
         if src.exists() and not src.is_symlink():
@@ -273,13 +290,42 @@ def install_pywal(repo):
         print_err("wal/templates not found in repo")
 
     # 2. Copy scripts to ~/.config/hypr/
-    for script in ["pywal.sh", "sync-caelestia-wallpaper.sh"]:
+    for script in ["pywal.sh", "sync-caelestia-wallpaper.sh", "waypaper-hook.sh"]:
         src = repo / script
         dst = hypr_dir / script
         if src.exists():
             shutil.copy2(str(src), str(dst))
             dst.chmod(0o755)
-    print_ok("Copied pywal.sh and sync-caelestia-wallpaper.sh to ~/.config/hypr/")
+    print_ok("Copied pywal.sh, sync-caelestia-wallpaper.sh, and waypaper-hook.sh to ~/.config/hypr/")
+
+    # 2b. Register waypaper hook in waypaper config
+    hook_cmd = str(hypr_dir / "waypaper-hook.sh")
+    waypaper_config_dir = home / ".config" / "waypaper"
+    waypaper_config_dir.mkdir(parents=True, exist_ok=True)
+    waypaper_ini = waypaper_config_dir / "config.ini"
+
+    config = configparser.ConfigParser()
+    if waypaper_ini.exists():
+        config.read(str(waypaper_ini))
+
+    if not config.has_section("Settings"):
+        config.add_section("Settings")
+
+    existing_post = config.get("Settings", "post_command", fallback="")
+    if existing_post and existing_post != hook_cmd:
+        print_warn(f"Waypaper already has post_command: {existing_post}")
+        if ask_yn("Replace with waypaper-hook.sh?"):
+            config.set("Settings", "post_command", hook_cmd)
+            with open(str(waypaper_ini), "w") as f:
+                config.write(f)
+            print_ok("Updated waypaper post_command to use waypaper-hook.sh")
+        else:
+            print_info(f"To add manually: set post_command = {hook_cmd} in ~/.config/waypaper/config.ini")
+    else:
+        config.set("Settings", "post_command", hook_cmd)
+        with open(str(waypaper_ini), "w") as f:
+            config.write(f)
+        print_ok("Registered waypaper-hook.sh as waypaper post_command")
 
     # 3. Copy pywal.sh to home for easy access
     home_pywal = home / "pywal.sh"
@@ -348,6 +394,37 @@ def install_pywal(repo):
         print_warn("No wallpaper found - run manually: wal -i <wallpaper> && ~/pywal.sh")
 
 
+def install_fastfetch_config(repo):
+    """Step: Install fastfetch configuration."""
+    home = Path.home()
+    fastfetch_src = repo / "fastfetch"
+
+    if not fastfetch_src.exists():
+        print_warn("fastfetch/ directory not found in repo - skipping")
+        return
+
+    if not ask_yn("Install fastfetch config?"):
+        print_warn("Skipping fastfetch config")
+        return
+
+    # Copy to ~/.config/fastfetch/
+    fastfetch_dst = home / ".config" / "fastfetch"
+    if fastfetch_dst.exists():
+        shutil.rmtree(str(fastfetch_dst))
+    shutil.copytree(str(fastfetch_src), str(fastfetch_dst))
+
+    # Fix hardcoded /home/duma/ path in config.jsonc for the current user
+    config_file = fastfetch_dst / "config.jsonc"
+    if config_file.exists():
+        content = config_file.read_text()
+        fixed = content.replace("/home/duma/", str(home) + "/")
+        if fixed != content:
+            config_file.write_text(fixed)
+            print_ok("Fixed fastfetch config paths for current user")
+
+    print_ok("Installed fastfetch config to ~/.config/fastfetch/")
+
+
 def print_banner():
     print(f"""{CYAN}{BOLD}
   ╦ ╦╦ ╦╔═╗╦═╗╔╦╗╦ ╦╔╦╗╔═╗
@@ -374,6 +451,9 @@ def print_post_install():
 
   {CYAN}4.{RESET} Change wallpaper + colors anytime:
      $ wal -i ~/path/to/wallpaper.jpg && ~/pywal.sh
+     Or use waypaper GUI ({BOLD}SUPER + W{RESET}) - colors auto-apply via hook
+
+  {CYAN}5.{RESET} Try {BOLD}fastfetch{RESET} in your terminal to see system info with custom styling
 
 {BOLD}Backups:{RESET} Original configs saved as ~/.config/<name>.backup
 {BOLD}Docs:{RESET}    See KEYBINDS.md for all keyboard shortcuts
@@ -386,7 +466,7 @@ def main():
     # Pre-flight check
     check_arch()
 
-    total = 7
+    total = 8
     step = 0
 
     # Step 1: AUR helpers
@@ -423,6 +503,11 @@ def main():
     step += 1
     print_step(step, total, "Setup Pywal Integration")
     install_pywal(repo)
+
+    # Step 8: Fastfetch
+    step += 1
+    print_step(step, total, "Install Fastfetch Config")
+    install_fastfetch_config(repo)
 
     print_post_install()
 

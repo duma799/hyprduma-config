@@ -9,7 +9,7 @@ return {
         "rcarriga/nvim-notify",
     },
     config = function()
-        vim.cmd("source ~/.cache/wal/colors-wal.vim")
+        pcall(function() vim.cmd("source ~/.cache/wal/colors-wal.vim") end)
         local color9 = vim.g.color9 or "#808080"
         local color5 = vim.g.color5 or "#ffffff"
         require("noice").setup({

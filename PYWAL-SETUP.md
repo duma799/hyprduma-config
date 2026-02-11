@@ -1,405 +1,247 @@
-# Pywal Color Integration Setup
+# Pywal Integration Guide
 
-This dotfiles repository includes pywal integration for dynamic color theming based on your wallpaper. The setup works with both Hyprland borders and Caelestia shell.
+Dynamic color theming based on your wallpaper, applied system-wide to Hyprland, Caelestia, Kitty, GTK apps, Firefox, and more.
 
 ## Prerequisites
 
-- `pywal` (python-pywal) installed
+- `python-pywal` installed (`sudo pacman -S python-pywal`)
 - Hyprland window manager
 - Caelestia shell (optional, for full integration)
 
-## Installation
+## Setup
 
-### 1. Install pywal
+If you used the auto-installer (`install.py`), pywal is already configured. For manual setup:
 
-```bash
-# Arch Linux
-sudo pacman -S python-pywal
-
-# Or via pip
-pip install pywal
-```
-
-### 2. Copy Template Files
-
-**CRITICAL:** Pywal templates MUST be in `~/.config/wal/templates/` for color generation to work.
+### 1. Install Templates
 
 ```bash
-# Create templates directory if it doesn't exist
 mkdir -p ~/.config/wal/templates
-
-# Copy ALL templates (from the repo directory)
 cp -r wal/templates/* ~/.config/wal/templates/
 
-# Verify templates are installed
+# Verify
 ls ~/.config/wal/templates/
 # Should show: hyprland-colors.conf, caelestia-scheme.json
 ```
 
-### 3. Copy the Apply Script
+### 2. Install Scripts
 
 ```bash
-# Copy the color application script to your hypr config
 cp pywal.sh ~/.config/hypr/
-
-# Make it executable
-chmod +x ~/.config/hypr/pywal.sh
-
-# Also copy to home directory for easier access
 cp pywal.sh ~/pywal.sh
-chmod +x ~/pywal.sh
+chmod +x ~/.config/hypr/pywal.sh ~/pywal.sh
 ```
 
-### 4. Configure Kitty Terminal
-
-**IMPORTANT:** Pywal generates `colors-kitty.conf` (not `kitty-colors.conf`).
+### 3. Configure Kitty Terminal
 
 ```bash
-# Create kitty config directory
 mkdir -p ~/.config/kitty
-
-# Copy kitty config from the repo
 cp kitty/kitty.conf ~/.config/kitty/
 
-# Verify the correct filename is referenced
+# Verify correct filename reference
 grep "colors-kitty" ~/.config/kitty/kitty.conf
 # Should show: include ~/.cache/wal/colors-kitty.conf
 ```
 
-If you already have a kitty config, add this line:
-```bash
-echo "include ~/.cache/wal/colors-kitty.conf" >> ~/.config/kitty/kitty.conf
-```
+### 4. Configure Shell
 
-### 5. Configure Bash Shell Colors
-
-**REQUIRED:** For terminal colors to work, your shell must load pywal sequences.
+Add to `~/.bashrc` (or `~/.zshrc`):
 
 ```bash
-# Add pywal integration to bashrc
-cat >> ~/.bashrc << 'EOF'
-
 # Import pywal colorscheme from cache
 (cat ~/.cache/wal/sequences &)
 
 # To add support for TTYs (optional)
 source ~/.cache/wal/colors-tty.sh 2>/dev/null
-EOF
+```
 
-# Reload bashrc
+### 5. Generate Initial Colors
+
+```bash
+wal -i wallpapers/sakura.jpg && ~/pywal.sh
 source ~/.bashrc
-```
-
-If you use zsh instead of bash, add to `~/.zshrc`:
-```bash
-cat >> ~/.zshrc << 'EOF'
-
-# Import pywal colorscheme from cache
-(cat ~/.cache/wal/sequences &)
-
-# To add support for TTYs (optional)
-source ~/.cache/wal/colors-tty.sh 2>/dev/null
-EOF
-```
-
-### 6. Generate Initial Colors
-
-```bash
-# Generate colors from a wallpaper
-wal -i /path/to/your/wallpaper.png
-
-# Or use the included wallpaper
-wal -i ~/.config/hypr/wallpapers/sakura.jpg
-
-# Apply colors to all components
-~/pywal.sh
-
-# Reload your shell
-source ~/.bashrc
-```
-
-**Verification:**
-```bash
-# Check that all color files were generated
-ls ~/.cache/wal/hyprland-colors.conf
-ls ~/.cache/wal/colors-kitty.conf
-ls ~/.cache/wal/caelestia-scheme.json 2>/dev/null  # if using Caelestia
-ls ~/.cache/wal/sequences
-
-# Open a new terminal - colors should be applied automatically
 ```
 
 ## Usage
 
-### Generate Colors from Wallpaper
+### Using Waypaper GUI (Recommended)
+
+Press `Super+W` to open waypaper. Select a wallpaper and colors auto-apply via the waypaper hook.
+
+### Command Line
 
 ```bash
-# Generate color palette from a wallpaper
-wal -i /path/to/your/wallpaper.png
+# Dark theme (default)
+~/pywal.sh ~/Pictures/wallpaper.jpg
 
-# Apply the generated colors to Hyprland and Caelestia (from anywhere)
+# Light theme
+~/pywal.sh ~/Pictures/wallpaper.jpg light
+
+# Switch mode (keep current wallpaper)
+~/pywal.sh "" light
+~/pywal.sh "" dark
+
+# Refresh current theme
 ~/pywal.sh
 ```
 
-### Quick Apply (One Command)
+### One-Liner
 
 ```bash
-# Generate and apply in one go
 wal -i /path/to/wallpaper.png && ~/pywal.sh
 ```
 
-### Regenerate from Current Wallpaper
+## Light/Dark Theme
+
+### Light Theme
+
+Works best with bright wallpapers:
 
 ```bash
-# Regenerate colors from cached wallpaper
-wal -R && ~/pywal.sh
+wal -i /path/to/bright-wallpaper.png -l && ~/pywal.sh
+```
+
+### Dark Theme (Default)
+
+```bash
+wal -i /path/to/dark-wallpaper.png && ~/pywal.sh
+```
+
+### Backend Options
+
+Different backends generate different color palettes:
+
+```bash
+wal -i /path/to/wallpaper.png --backend colorz      # More vibrant
+wal -i /path/to/wallpaper.png --backend colorthief   # Alternative palette
+wal -i /path/to/wallpaper.png --backend haishoku     # Another option
 ```
 
 ## What Gets Themed
 
-### Hyprland
-- **Active window borders**: Gradient using pywal colors 4 and 6
-- **Inactive window borders**: Using pywal color 8 (muted gray tone)
+| Component | What changes |
+|-----------|-------------|
+| **Hyprland** | Window borders (active gradient, inactive) |
+| **Caelestia Shell** | Material Design 3 color scheme, all UI elements |
+| **Kitty Terminal** | Background, foreground, all 16 colors |
+| **Bash/Zsh Shell** | Terminal color palette via sequences |
+| **GTK Apps** | Via `wal-gtk` (if installed) |
+| **Firefox** | Via `pywalfox` (if installed) |
+| **System** | Dark/light mode preference via gsettings |
 
-### Kitty Terminal
-- **All 16 terminal colors** (color0-color15)
-- **Background, foreground, cursor colors**
-- Automatically reloaded when colors change (via SIGUSR1)
+## Optional Enhancements
 
-### Bash/Zsh Shell
-- **Terminal color palette** loaded via sequences
-- **TTY colors** for console mode
-- Applied automatically when opening new terminals
+### GTK Theme Support
 
-### Caelestia Shell (if installed)
-- Complete Material Design 3 color scheme
-- Terminal colors (color0-color15)
-- Background, surface, and accent colors
-- All UI elements adapt to wallpaper colors
-
-## Files Structure
-
+```bash
+yay -S wal-gtk-theme-git
+# pywal.sh will automatically generate GTK themes
 ```
-hyprduma-config/
-├── hyprland.conf                    # Main config with pywal integration
-├── pywal.sh                         # Script to apply colors (easy name!)
-└── wal/
-    └── templates/
-        ├── hyprland-colors.conf     # Hyprland border colors template
-        └── caelestia-scheme.json    # Caelestia color scheme template
+
+### Firefox Theme Support
+
+```bash
+yay -S python-pywalfox
+pywalfox install
+# Then install the Pywalfox extension from Firefox Add-ons
+```
+
+### Qt Application Support
+
+```bash
+yay -S qt5ct qt6ct kvantum
+echo "QT_QPA_PLATFORMTHEME=qt5ct" >> ~/.config/environment.d/qt.conf
+echo "QT_STYLE_OVERRIDE=kvantum" >> ~/.config/environment.d/qt.conf
 ```
 
 ## Customization
 
-### Changing Border Color Mapping
+### Border Colors
 
 Edit `~/.config/wal/templates/hyprland-colors.conf`:
 
 ```conf
-# Example: Use different colors for borders
 general {
-    col.active_border = rgba({color2.strip}ee) rgba({color5.strip}ee) 45deg
-    col.inactive_border = rgba({color0.strip}aa)
+    col.active_border = rgba({color4.strip}ee) rgba({color6.strip}ee) 45deg
+    col.inactive_border = rgba({color8.strip}aa)
 }
 ```
 
-Available variables:
-- `{color0}` through `{color15}` - Palette colors
-- `{background}` - Background color
-- `{foreground}` - Foreground/text color
-- `{cursor}` - Cursor color
+Available variables: `{color0}` through `{color15}`, `{background}`, `{foreground}`, `{cursor}`
 
-After editing, regenerate colors with `wal -R`.
+After editing, regenerate with `wal -R`.
 
-### Modifying Caelestia Colors
+### Caelestia Colors
 
-Edit `~/.config/wal/templates/caelestia-scheme.json` to change how pywal colors map to Caelestia's Material Design 3 scheme.
+Edit `~/.config/wal/templates/caelestia-scheme.json` to adjust Material Design 3 color mappings.
 
-## Automation
+## How It Works
 
-### Auto-apply on Hyprland Startup
+1. `wal -i wallpaper.png` generates colors and processes templates in `~/.config/wal/templates/`
+2. Generated files land in `~/.cache/wal/`
+3. `hyprland.conf` sources `~/.cache/wal/hyprland-colors.conf` for border colors
+4. `pywal.sh` copies the Caelestia scheme, reloads Hyprland, restarts Caelestia, reloads Kitty, and sets GTK/Firefox themes
+5. The waypaper hook (`waypaper-hook.sh`) runs this entire chain automatically on wallpaper change
 
-The colors are automatically loaded via the `source` directive in `hyprland.conf`. However, to regenerate on startup:
+## Files
 
-```bash
-# Add to hyprland.conf autostart section
-exec-once = wal -R -n
 ```
+~/.config/wal/templates/
+├── hyprland-colors.conf     # Template for Hyprland border colors
+└── caelestia-scheme.json    # Template for Caelestia color scheme
 
-### Integrate with Wallpaper Managers
-
-If using `waypaper`, `hyprpaper`, or similar:
-
-```bash
-# Create a wrapper script that sets wallpaper and applies colors
-#!/bin/bash
-# Set wallpaper with your tool of choice
-hyprctl hyprpaper wallpaper "eDP-1,/path/to/wallpaper.png"
-
-# Generate and apply pywal colors
-wal -i /path/to/wallpaper.png && ~/pywal.sh
+~/.cache/wal/                # Generated by pywal
+├── hyprland-colors.conf     # Sourced by hyprland.conf
+├── colors-kitty.conf        # Included by kitty.conf
+├── caelestia-scheme.json    # Copied to Caelestia state dir
+├── sequences                # Loaded by bashrc
+└── colors.json              # Full color palette
 ```
 
 ## Troubleshooting
 
-### Colors work in Hyprland but NOT in terminals/shell
+### Colors not applying to terminals
 
-This is the most common issue. Follow these steps:
+1. Check bashrc has pywal lines: `grep pywal ~/.bashrc`
+2. Check cache exists: `ls ~/.cache/wal/sequences`
+3. Open a **new** terminal (existing ones need `source ~/.bashrc`)
 
-**1. Check if templates are installed correctly:**
+### Kitty colors wrong
+
 ```bash
-ls ~/.config/wal/templates/
-# Should show: hyprland-colors.conf, caelestia-scheme.json
-```
-
-If missing:
-```bash
-mkdir -p ~/.config/wal/templates
-cp ~/.config/hypr/wal/templates/* ~/.config/wal/templates/
-wal -R  # Regenerate with templates
-```
-
-**2. Check bashrc configuration:**
-```bash
-grep -A 5 "pywal" ~/.bashrc
-```
-
-Should show the pywal loading lines. If missing, add them:
-```bash
-cat >> ~/.bashrc << 'EOF'
-
-# Import pywal colorscheme from cache
-(cat ~/.cache/wal/sequences &)
-
-# To add support for TTYs (optional)
-source ~/.cache/wal/colors-tty.sh 2>/dev/null
-EOF
-
-source ~/.bashrc
-```
-
-**3. Check Kitty configuration:**
-```bash
+# Must reference colors-kitty.conf (not kitty-colors.conf)
 grep "wal" ~/.config/kitty/kitty.conf
-```
 
-Must show: `include ~/.cache/wal/colors-kitty.conf` (NOT `kitty-colors.conf`)
-
-Fix if needed:
-```bash
+# Fix if wrong
 sed -i 's/kitty-colors.conf/colors-kitty.conf/g' ~/.config/kitty/kitty.conf
-killall -SIGUSR1 kitty  # Reload kitty terminals
-```
-
-**4. Verify cache files exist:**
-```bash
-ls -lh ~/.cache/wal/*.conf ~/.cache/wal/sequences
-```
-
-Should show non-empty files. If empty or missing:
-```bash
-wal -R && ~/pywal.sh
-```
-
-### Colors not updating in Hyprland
-
-```bash
-# Reload Hyprland configuration
-hyprctl reload
-```
-
-### Colors not updating in Caelestia
-
-```bash
-# Restart Caelestia shell
-pkill caelestia && sleep 0.5 && caelestia shell -d &
-```
-
-### Kitty colors not updating
-
-```bash
-# Check if colors-kitty.conf exists and has content
-cat ~/.cache/wal/colors-kitty.conf
-
-# Reload all Kitty terminals
 killall -SIGUSR1 kitty
+```
+
+### Caelestia not updating
+
+```bash
+pkill caelestia && sleep 0.5 && caelestia shell -d &
 ```
 
 ### Hyprland fails to start (source file not found)
 
-If pywal hasn't been run yet, the source file won't exist. Either:
-
-1. Run `wal -i /path/to/wallpaper.png` once to generate initial colors
-2. Or comment out the `source` line in `hyprland.conf` until you set up pywal
-
-### Shell colors not loading in new terminals
-
-```bash
-# Test if sequences file exists and has content
-cat ~/.cache/wal/sequences
-
-# Test loading manually
-source ~/.bashrc
-
-# Check if the pywal lines are actually in bashrc
-tail -10 ~/.bashrc
-```
+Run `wal -i /path/to/wallpaper.png` once to generate initial colors before starting Hyprland.
 
 ### Complete Reset
 
-If nothing works, do a complete reset:
-
 ```bash
-# Remove old cache
 rm -rf ~/.cache/wal
-
-# Reinstall templates
 mkdir -p ~/.config/wal/templates
 cp ~/.config/hypr/wal/templates/* ~/.config/wal/templates/
-
-# Regenerate everything
-wal -i /path/to/wallpaper.png
-~/pywal.sh
-
-# Reload shell
+wal -i /path/to/wallpaper.png && ~/pywal.sh
 source ~/.bashrc
-
-# Open new terminal to test
 ```
 
-### Check Generated Files
+### Kitty Opacity for Light Themes
 
-```bash
-# View generated Hyprland colors
-cat ~/.cache/wal/hyprland-colors.conf
+If light theme is too transparent, adjust in `~/.config/kitty/kitty.conf`:
 
-# View generated Kitty colors
-cat ~/.cache/wal/colors-kitty.conf
-
-# View generated Caelestia scheme
-cat ~/.cache/wal/caelestia-scheme.json
-
-# View pywal color palette
-cat ~/.cache/wal/colors.json
-
-# Check sequences (terminal colors)
-cat ~/.cache/wal/sequences
+```conf
+background_opacity 0.95
 ```
 
-## Pywal Backend Options
-
-Pywal supports different color extraction backends:
-
-```bash
-# Use imagemagick (default)
-wal -i /path/to/wallpaper.png
-
-# Use colorz (more vibrant colors)
-wal -i /path/to/wallpaper.png --backend colorz
-
-# Use colorthief
-wal -i /path/to/wallpaper.png --backend colorthief
-
-# Use haishoku
-wal -i /path/to/wallpaper.png --backend haishoku
-```
+Reload: `killall -SIGUSR1 kitty`

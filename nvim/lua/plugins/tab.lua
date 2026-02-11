@@ -16,5 +16,5 @@ return {
             }
         }
     end,
-    requires = {'hoob3rt/lualine.nvim', 'kyazdani42/nvim-web-devicons'}
+    dependencies = {'nvim-lualine/lualine.nvim', 'nvim-tree/nvim-web-devicons'}
 }

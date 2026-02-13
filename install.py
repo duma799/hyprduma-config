@@ -93,10 +93,10 @@ def cmd_exists(name):
 
 def find_repo_dir():
     cwd = Path.cwd()
-    if (cwd / "hyprland.conf").exists() and (cwd / "pywal.sh").exists():
+    if (cwd / "hyprland.conf").exists() and (cwd / "scripts" / "pywal.sh").exists():
         return cwd
     script_dir = Path(__file__).resolve().parent
-    if (script_dir / "hyprland.conf").exists() and (script_dir / "pywal.sh").exists():
+    if (script_dir / "hyprland.conf").exists() and (script_dir / "scripts" / "pywal.sh").exists():
         return script_dir
     return None
 
@@ -277,13 +277,13 @@ def install_pywal(repo):
     # Pywal templates
     templates_dst = home / ".config" / "wal" / "templates"
     templates_dst.mkdir(parents=True, exist_ok=True)
-    templates_src = repo / "wal" / "templates"
+    templates_src = repo / "config" / "wal" / "templates"
     if templates_src.exists():
         for f in templates_src.iterdir():
             shutil.copy2(str(f), str(templates_dst / f.name))
         print_ok("Installed pywal templates")
     else:
-        print_err("wal/templates not found in repo")
+        print_err("config/wal/templates not found in repo")
 
     # Scripts
     for script in [
@@ -292,7 +292,7 @@ def install_pywal(repo):
         "waypaper-hook.sh",
         "monitor-handler.py",
     ]:
-        src = repo / script
+        src = repo / "scripts" / script
         dst = hypr_dir / script
         if src.exists():
             shutil.copy2(str(src), str(dst))
@@ -332,14 +332,14 @@ def install_pywal(repo):
 
     # pywal.sh in home
     home_pywal = home / "pywal.sh"
-    shutil.copy2(str(repo / "pywal.sh"), str(home_pywal))
+    shutil.copy2(str(repo / "scripts" / "pywal.sh"), str(home_pywal))
     home_pywal.chmod(0o755)
     print_ok("Copied pywal.sh to ~/pywal.sh")
 
     # Kitty
     kitty_dir = home / ".config" / "kitty"
     kitty_dir.mkdir(parents=True, exist_ok=True)
-    kitty_src = repo / "kitty" / "kitty.conf"
+    kitty_src = repo / "config" / "kitty" / "kitty.conf"
     if kitty_src.exists():
         shutil.copy2(str(kitty_src), kitty_dir / "kitty.conf")
         print_ok("Installed kitty config with pywal colors")
@@ -402,7 +402,7 @@ def install_pywal(repo):
 
 def install_fastfetch_config(repo):
     home = Path.home()
-    fastfetch_src = repo / "fastfetch"
+    fastfetch_src = repo / "config" / "fastfetch"
 
     if not fastfetch_src.exists():
         print_warn("fastfetch/ directory not found in repo - skipping")

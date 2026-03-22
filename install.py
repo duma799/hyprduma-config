@@ -527,6 +527,10 @@ def main():
     print_step(step, total, "Install Fastfetch Config")
     install_fastfetch_config(repo)
 
+    step += 1
+    print_step(step, total, "Install Neovim Config")
+    install_nvim_config(repo)
+
     print_post_install()
 
 

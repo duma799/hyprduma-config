@@ -37,6 +37,7 @@ PACMAN_PACKAGES = [
     "adwaita-cursors",
     "python-pywal",
     "fastfetch",
+    "neovim",
 ]
 
 
@@ -232,7 +233,7 @@ def backup_configs():
     config = Path.home() / ".config"
     backed_up = []
 
-    for name in ["hypr", "waybar", "wlogout", "waypaper"]:
+    for name in ["hypr", "waybar", "wlogout", "waypaper", "nvim", "fastfetch"]:
         src = config / name
         dst = config / f"{name}.backup"
         if src.exists() and not src.is_symlink():
@@ -260,13 +261,13 @@ def install_hypr_config(repo):
     print_ok(f"Created {screenshots}")
 
     wallpapers_src = repo / "wallpapers"
-    wallpapers_dst = hypr_dir / "wallpapers"
+    wallpapers_dst = Path.home() / "wallpapers"
     if wallpapers_src.exists():
         if wallpapers_dst.exists():
             shutil.rmtree(wallpapers_dst)
         shutil.copytree(str(wallpapers_src), str(wallpapers_dst))
         count = len(list(wallpapers_dst.iterdir()))
-        print_ok(f"Copied {count} wallpapers to ~/.config/hypr/wallpapers/")
+        print_ok(f"Copied {count} wallpapers to ~/wallpapers/")
 
 
 def install_pywal(repo):
@@ -286,6 +287,8 @@ def install_pywal(repo):
         print_err("config/wal/templates not found in repo")
 
     # Scripts
+    scripts_dir = hypr_dir / "scripts"
+    scripts_dir.mkdir(parents=True, exist_ok=True)
     for script in [
         "pywal.sh",
         "sync-caelestia-wallpaper.sh",
@@ -293,14 +296,14 @@ def install_pywal(repo):
         "monitor-handler.py",
     ]:
         src = repo / "scripts" / script
-        dst = hypr_dir / script
+        dst = scripts_dir / script
         if src.exists():
             shutil.copy2(str(src), str(dst))
             dst.chmod(0o755)
-    print_ok("Copied scripts to ~/.config/hypr/")
+    print_ok("Copied scripts to ~/.config/hypr/scripts/")
 
     # Waypaper hook
-    hook_cmd = str(hypr_dir / "waypaper-hook.sh")
+    hook_cmd = str(scripts_dir / "waypaper-hook.sh")
     waypaper_config_dir = home / ".config" / "waypaper"
     waypaper_config_dir.mkdir(parents=True, exist_ok=True)
     waypaper_ini = waypaper_config_dir / "config.ini"
@@ -330,11 +333,7 @@ def install_pywal(repo):
             config.write(f)
         print_ok("Registered waypaper-hook.sh as waypaper post_command")
 
-    # pywal.sh in home
-    home_pywal = home / "pywal.sh"
-    shutil.copy2(str(repo / "scripts" / "pywal.sh"), str(home_pywal))
-    home_pywal.chmod(0o755)
-    print_ok("Copied pywal.sh to ~/pywal.sh")
+    # pywal.sh is already in ~/.config/hypr/scripts/pywal.sh
 
     # Kitty
     kitty_dir = home / ".config" / "kitty"
@@ -362,16 +361,18 @@ def install_pywal(repo):
             "(cat ~/.cache/wal/sequences &)\n"
             "\n# To add support for TTYs (optional)\n"
             "source ~/.cache/wal/colors-tty.sh 2>/dev/null\n"
+            "\n# Alias for pywal color generator\n"
+            "alias pywal='~/.config/hypr/scripts/pywal.sh'\n"
         )
         with open(bashrc, "a") as f:
             f.write(snippet)
-        print_ok("Added pywal integration to ~/.bashrc")
+        print_ok("Added pywal integration and alias to ~/.bashrc")
 
     # Initial colors
-    wallpaper = hypr_dir / "wallpapers" / "sakura.jpg"
+    wallpaper = Path.home() / "wallpapers" / "sakura.jpg"
     if not wallpaper.exists():
         # Fallback
-        wp_dir = hypr_dir / "wallpapers"
+        wp_dir = Path.home() / "wallpapers"
         if wp_dir.exists():
             for ext in ("*.jpg", "*.png", "*.jpeg"):
                 found = list(wp_dir.glob(ext))
@@ -384,19 +385,19 @@ def install_pywal(repo):
         run(f'wal -i {shlex.quote(str(wallpaper))}')
         print_ok("Generated initial pywal color scheme")
 
-        pywal_script = home / "pywal.sh"
+        pywal_script = scripts_dir / "pywal.sh"
         if pywal_script.exists():
             if run(f'bash {shlex.quote(str(pywal_script))}'):
                 print_ok("Applied pywal colors to all components")
             else:
-                print_warn("pywal.sh had errors (normal if Hyprland isn't running yet)")
+                print_warn("pywal script had errors (normal if Hyprland isn't running yet)")
     elif not cmd_exists("wal"):
         print_warn(
-            "pywal (wal) not found - install python-pywal and run: wal -i <wallpaper> && ~/pywal.sh"
+            "pywal (wal) not found - install python-pywal and run: wal -i <wallpaper> && pywal"
         )
     else:
         print_warn(
-            "No wallpaper found - run manually: wal -i <wallpaper> && ~/pywal.sh"
+            "No wallpaper found - run manually: wal -i <wallpaper> && pywal"
         )
 
 
@@ -429,6 +430,26 @@ def install_fastfetch_config(repo):
     print_ok("Installed fastfetch config to ~/.config/fastfetch/")
 
 
+def install_nvim_config(repo):
+    home = Path.home()
+    nvim_src = repo / "config" / "nvim"
+
+    if not nvim_src.exists():
+        print_warn("nvim/ directory not found in repo - skipping")
+        return
+
+    if not ask_yn("Install Neovim config?"):
+        print_warn("Skipping Neovim config")
+        return
+
+    nvim_dst = home / ".config" / "nvim"
+    if nvim_dst.exists():
+        shutil.rmtree(str(nvim_dst))
+    shutil.copytree(str(nvim_src), str(nvim_dst))
+
+    print_ok("Installed Neovim config to ~/.config/nvim/")
+
+
 def print_banner():
     print(f"""{CYAN}{BOLD}
         
@@ -456,7 +477,7 @@ def print_post_install():
      Or if already running, reload with: {BOLD}SUPER + SHIFT + R{RESET}
 
   {CYAN}4.{RESET} Change wallpaper + colors anytime:
-     $ wal -i ~/path/to/wallpaper.jpg && ~/pywal.sh
+     $ wal -i ~/path/to/wallpaper.jpg && pywal
      Or use waypaper GUI ({BOLD}SUPER + W{RESET}) - colors auto-apply via hook
 
   {CYAN}5.{RESET} Try {BOLD}fastfetch{RESET} in your terminal to see system info with custom styling
@@ -471,7 +492,7 @@ def main():
 
     check_arch()
 
-    total = 8
+    total = 9
     step = 0
 
     step += 1

@@ -34,9 +34,6 @@ if [ -f "$WALLPAPER" ]; then
     # Resolve pywal.sh location (same directory as this hook, or ~/pywal.sh)
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
     PYWAL_SCRIPT="$SCRIPT_DIR/pywal.sh"
-    if [ ! -f "$PYWAL_SCRIPT" ]; then
-        PYWAL_SCRIPT="$HOME/pywal.sh"
-    fi
 
     if [ -f "$PYWAL_SCRIPT" ]; then
         bash "$PYWAL_SCRIPT" "$WALLPAPER" >> "$LOG_FILE" 2>&1

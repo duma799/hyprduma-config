@@ -26,9 +26,8 @@ ls ~/.config/wal/templates/
 ### 2. Install Scripts
 
 ```bash
-cp pywal.sh ~/.config/hypr/
-cp pywal.sh ~/pywal.sh
-chmod +x ~/.config/hypr/pywal.sh ~/pywal.sh
+cp pywal.sh ~/.config/hypr/scripts/
+chmod +x ~/.config/hypr/scripts/pywal.sh
 ```
 
 ### 3. Configure Kitty Terminal
@@ -57,7 +56,7 @@ source ~/.cache/wal/colors-tty.sh 2>/dev/null
 ### 5. Generate Initial Colors
 
 ```bash
-wal -i wallpapers/sakura.jpg && ~/pywal.sh
+wal -i wallpapers/sakura.jpg && pywal
 source ~/.bashrc
 ```
 
@@ -71,14 +70,14 @@ Press `Super+W` to open waypaper. Select a wallpaper and colors auto-apply via t
 
 ```bash
 # Dark theme (default)
-~/pywal.sh ~/Pictures/wallpaper.jpg
+pywal ~/Pictures/wallpaper.jpg
 
 # Light theme
-~/pywal.sh ~/Pictures/wallpaper.jpg light
+pywal ~/Pictures/wallpaper.jpg light
 
 # Switch mode (keep current wallpaper)
-~/pywal.sh "" light
-~/pywal.sh "" dark
+pywal "" light
+pywal "" dark
 
 # Refresh current theme
 ~/pywal.sh
@@ -87,7 +86,7 @@ Press `Super+W` to open waypaper. Select a wallpaper and colors auto-apply via t
 ### One-Liner
 
 ```bash
-wal -i /path/to/wallpaper.png && ~/pywal.sh
+wal -i /path/to/wallpaper.png && pywal
 ```
 
 ## Light/Dark Theme
@@ -97,13 +96,13 @@ wal -i /path/to/wallpaper.png && ~/pywal.sh
 Works best with bright wallpapers:
 
 ```bash
-wal -i /path/to/bright-wallpaper.png -l && ~/pywal.sh
+wal -i /path/to/bright-wallpaper.png -l && pywal
 ```
 
 ### Dark Theme (Default)
 
 ```bash
-wal -i /path/to/dark-wallpaper.png && ~/pywal.sh
+wal -i /path/to/dark-wallpaper.png && pywal
 ```
 
 ### Backend Options
@@ -232,7 +231,7 @@ Run `wal -i /path/to/wallpaper.png` once to generate initial colors before start
 rm -rf ~/.cache/wal
 mkdir -p ~/.config/wal/templates
 cp ~/.config/hypr/wal/templates/* ~/.config/wal/templates/
-wal -i /path/to/wallpaper.png && ~/pywal.sh
+wal -i /path/to/wallpaper.png && pywal
 source ~/.bashrc
 ```
 

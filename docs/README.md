@@ -103,7 +103,7 @@ cd hyprduma-config
 # Install Hyprland config
 mkdir -p ~/.config/hypr
 cp hyprland.conf ~/.config/hypr/
-cp -r wallpapers ~/.config/hypr/
+cp -r wallpapers ~/wallpapers
 mkdir -p ~/Pictures/Screenshots
 ```
 
@@ -111,12 +111,13 @@ mkdir -p ~/Pictures/Screenshots
 
 ```bash
 # Copy all scripts
-cp pywal.sh sync-caelestia-wallpaper.sh waypaper-hook.sh ~/.config/hypr/
-cp monitor-handler.py ~/.config/hypr/
-chmod +x ~/.config/hypr/pywal.sh ~/.config/hypr/sync-caelestia-wallpaper.sh ~/.config/hypr/waypaper-hook.sh
+mkdir -p ~/.config/hypr/scripts
+cp pywal.sh sync-caelestia-wallpaper.sh waypaper-hook.sh ~/.config/hypr/scripts/
+cp monitor-handler.py ~/.config/hypr/scripts/
+chmod +x ~/.config/hypr/scripts/*.sh
 
-# Copy pywal.sh to home for convenience
-cp pywal.sh ~/pywal.sh && chmod +x ~/pywal.sh
+# Note: The script aliases 'pywal' to ~/.config/hypr/scripts/pywal.sh
+# To set it up manually: echo "alias pywal='~/.config/hypr/scripts/pywal.sh'" >> ~/.bashrc
 ```
 
 ### Step 5: Configure Your Applications
@@ -155,7 +156,7 @@ source ~/.cache/wal/colors-tty.sh 2>/dev/null
 EOF
 
 # Generate initial colors
-wal -i wallpapers/sakura.jpg && ~/pywal.sh
+wal -i ~/wallpapers/sakura.jpg && pywal
 source ~/.bashrc
 ```
 
@@ -167,7 +168,7 @@ The waypaper hook automatically applies pywal colors whenever you change wallpap
 # Set waypaper-hook.sh as waypaper's post_command
 mkdir -p ~/.config/waypaper
 # Add to ~/.config/waypaper/config.ini under [Settings]:
-# post_command = /home/YOUR_USER/.config/hypr/waypaper-hook.sh
+# post_command = ~/.config/hypr/scripts/waypaper-hook.sh
 ```
 
 ### Step 8: Install Fastfetch Config (Optional)
@@ -201,7 +202,7 @@ Hyprland
 
 **Using command line:**
 ```bash
-wal -i /path/to/wallpaper.png && ~/pywal.sh
+wal -i /path/to/wallpaper.png && pywal
 ```
 
 **How wallpaper management works:**
@@ -216,10 +217,10 @@ wal -i /path/to/wallpaper.png && ~/pywal.sh
 The `pywal.sh` script supports dark/light mode and system-wide theme synchronization (GTK, Firefox, Qt). See **[PYWAL-SETUP.md](PYWAL-SETUP.md)** for the full guide including optional enhancements, light/dark theme switching, and backend options.
 
 ```bash
-~/pywal.sh ~/Pictures/wallpaper.jpg          # Dark theme (default)
-~/pywal.sh ~/Pictures/wallpaper.jpg light    # Light theme
-~/pywal.sh "" dark                            # Switch mode, keep wallpaper
-~/pywal.sh                                    # Refresh current theme
+pywal ~/Pictures/wallpaper.jpg          # Dark theme (default)
+pywal ~/Pictures/wallpaper.jpg light    # Light theme
+pywal "" dark                            # Switch mode, keep wallpaper
+pywal                                    # Refresh current theme
 ```
 
 ### Monitor Configuration
@@ -308,7 +309,7 @@ hyprduma-config/
 
 2. **Regenerate colors:**
    ```bash
-   wal -R && ~/pywal.sh
+   wal -R && pywal
    ```
 
 3. **Check bash configuration:**
@@ -351,9 +352,9 @@ hyprduma-config/
    ```
 
 **General pywal troubleshooting:**
-- Ensure the script is executable: `chmod +x ~/pywal.sh`
+- Ensure the script is executable: `chmod +x ~/.config/hypr/scripts/pywal.sh`
 - Check if pywal cache exists: `ls ~/.cache/wal/`
-- Manually reload: `~/pywal.sh`
+- Manually reload: `pywal`
 
 ### Caelestia colors not updating
 ```bash

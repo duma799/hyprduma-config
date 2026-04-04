@@ -38,13 +38,13 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/duma799/hyprduma-config/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/duma799/hyprduma-config/master/install.py | python3
 ```
 
 Or manually:
 ```bash
-git clone https://github.com/duma799/hyprduma-config.git ~/Downloads/hyprduma-config
-python3 ~/Downloads/hyprduma-config/install.py
+git clone https://github.com/duma799/hyprduma-config.git ~/hyprduma-config
+python3 ~/hyprduma-config/install.py
 ```
 
 The interactive installer handles everything:
@@ -265,11 +265,12 @@ hyprduma-config/
 ├── sync-caelestia-wallpaper.sh # Sync swaybg wallpaper to Caelestia
 ├── monitor-handler.py         # Restart wallpaper/shell after config reload
 ├── install.py                 # Interactive auto-installer
-├── install.sh                 # Curl one-liner bootstrap script
 ├── wallpapers/                # Included wallpapers
-├── wal/templates/             # Pywal templates for Hyprland & Caelestia
-├── kitty/kitty.conf           # Kitty terminal config with pywal support
-├── fastfetch/                 # Custom fastfetch config with ASCII art
+├── config/
+│   ├── kitty/kitty.conf       # Kitty terminal config with pywal support
+│   ├── fastfetch/             # Custom fastfetch config with ASCII art
+│   ├── nvim/                  # Neovim config
+│   └── wal/templates/         # Pywal templates for Hyprland & Caelestia
 ├── KEYBINDS.md                # Complete keybindings reference
 └── PYWAL-SETUP.md             # Detailed pywal integration guide
 ```

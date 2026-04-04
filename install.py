@@ -132,7 +132,7 @@ def install_aur_helpers():
         missing.append("paru")
 
     if not ask_yn(f"Install AUR helper(s): {', '.join(missing)}?"):
-        print_warn("Skipping AUR helpers (caelestia-shell will require manual install)")
+        print_warn("Skipping AUR helpers")
         return
 
     run("sudo pacman -S --needed --noconfirm git base-devel")
@@ -166,44 +166,6 @@ def install_packages():
         print_err("Some packages failed to install - check output above")
     else:
         print_ok("All packages installed")
-
-
-def install_caelestia():
-    already_installed = cmd_exists("caelestia")
-
-    if already_installed:
-        print_ok("Caelestia shell is already installed")
-    else:
-        if not cmd_exists("yay") and not cmd_exists("paru"):
-            print_warn(
-                "No AUR helper found - skipping Caelestia (install manually: yay -S caelestia-shell)"
-            )
-            return
-
-        if not ask_yn("Install Caelestia Shell (recommended for dynamic theming)?"):
-            print_warn("Skipping Caelestia shell")
-            return
-
-        helper = "yay" if cmd_exists("yay") else "paru"
-        if run(f"{helper} -S --noconfirm caelestia-shell"):
-            print_ok("Caelestia shell installed")
-        else:
-            print_err(
-                "Failed to install Caelestia - you can try manually: yay -S caelestia-shell"
-            )
-            return
-
-    state_dir = Path.home() / ".local" / "state" / "caelestia"
-    wallpaper_dir = state_dir / "wallpaper"
-    wallpaper_dir.mkdir(parents=True, exist_ok=True)
-    print_ok("Created Caelestia state directories (~/.local/state/caelestia/)")
-
-    if run("pgrep -x Hyprland", capture=True) is not None:
-        print_info("Hyprland detected, launching Caelestia shell...")
-        run("caelestia shell -d &", check=False)
-        print_ok("Caelestia shell launched")
-    else:
-        print_info("Caelestia will start automatically on next Hyprland session")
 
 
 def make_symlink(src: Path, dst: Path):
@@ -473,7 +435,7 @@ def main():
 
     check_arch()
 
-    total = 9
+    total = 8
     step = 0
 
     step += 1
@@ -483,10 +445,6 @@ def main():
     step += 1
     print_step(step, total, "Install Required Packages")
     install_packages()
-
-    step += 1
-    print_step(step, total, "Install Caelestia Shell")
-    install_caelestia()
 
     step += 1
     print_step(step, total, "Locate/Clone Repository")

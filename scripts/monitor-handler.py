@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Restarts wallpaper and caelestia shell after hyprland config reload
+# Restarts wallpaper after hyprland config reload
 
 import os
 import socket
@@ -21,9 +21,6 @@ def handle_reload():
     time.sleep(1)
     if not is_running("swaybg"):
         subprocess.Popen(["waypaper", "--restore"])
-    if not is_running("caelestia"):
-        time.sleep(1)
-        subprocess.Popen(["caelestia", "shell", "-d"])
 
 def listen(path):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

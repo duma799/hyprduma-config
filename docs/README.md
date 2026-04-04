@@ -14,7 +14,6 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 - Transparency with configurable opacity (active: 0.985, inactive: 0.85)
 - Smooth custom animations with bezier curves
 - **Pywal integration** - Dynamic system-wide colors from wallpaper
-- **Caelestia shell** integration for dynamic theming and AI features
 
 ### Input
 - 3-finger gestures (horizontal: workspace, vertical: fullscreen)
@@ -25,12 +24,12 @@ Personal Hyprland configuration focused on productivity and ergonomics.
 ### Display Setup
 - Auto-detected monitor configuration (works with any setup out of the box)
 - Workspaces 1-4 on external monitor, 5-10 on laptop screen
-- **Monitor handler** - automatically restores wallpaper and Caelestia shell after config reload
+- **Monitor handler** - automatically restores wallpaper after config reload
 
 ### Automation
 - **Auto-installer** - interactive Python installer handles the entire setup
 - **Waypaper hook** - pywal colors auto-apply when wallpaper changes via waypaper GUI
-- **Monitor handler** - listens for Hyprland config reloads and restarts swaybg/Caelestia
+- **Monitor handler** - listens for Hyprland config reloads and restarts swaybg
 - **Fastfetch config** - custom system info display with ASCII art
 
 ---
@@ -50,12 +49,11 @@ python3 ~/hyprduma-config/install.py
 The interactive installer handles everything:
 1. AUR helpers (yay/paru)
 2. Required packages via pacman
-3. Caelestia shell
-4. Config backup and installation
-5. Pywal integration (templates, scripts, bashrc, initial colors)
-6. Waypaper hook for automatic color application
-7. Monitor handler for config reload resilience
-8. Fastfetch config with custom ASCII art
+3. Config backup and installation
+4. Pywal integration (templates, scripts, bashrc, initial colors)
+5. Waypaper hook for automatic color application
+6. Monitor handler for config reload resilience
+7. Fastfetch config with custom ASCII art
 
 ---
 
@@ -82,13 +80,7 @@ cd paru && makepkg -si && cd .. && rm -rf paru
 sudo pacman -S hyprland hyprlock hyprshot wlogout kitty waybar swaybg waypaper wofi nautilus wireplumber pipewire-pulse brightnessctl playerctl adwaita-cursors python-pywal fastfetch
 ```
 
-### Step 2: Install Caelestia Shell (Recommended)
-
-```bash
-yay -S caelestia-shell
-```
-
-### Step 3: Clone and Install Config
+### Step 2: Clone and Install Config
 
 ```bash
 cd ~/Downloads
@@ -112,7 +104,7 @@ mkdir -p ~/Pictures/Screenshots
 ```bash
 # Copy all scripts
 mkdir -p ~/.config/hypr/scripts
-cp pywal.sh sync-caelestia-wallpaper.sh waypaper-hook.sh ~/.config/hypr/scripts/
+cp pywal.sh waypaper-hook.sh ~/.config/hypr/scripts/
 cp monitor-handler.py ~/.config/hypr/scripts/
 chmod +x ~/.config/hypr/scripts/*.sh
 
@@ -198,7 +190,7 @@ Hyprland
 
 **Using waypaper GUI (recommended):**
 - Press `Super+W` to open waypaper
-- Select a wallpaper - the **waypaper hook** automatically runs pywal and syncs colors to all components (Hyprland, Caelestia, Kitty, GTK, Firefox)
+- Select a wallpaper - the **waypaper hook** automatically runs pywal and syncs colors to all components (Hyprland, Kitty, GTK, Firefox)
 
 **Using command line:**
 ```bash
@@ -208,9 +200,8 @@ wal -i /path/to/wallpaper.png && pywal
 **How wallpaper management works:**
 - **swaybg** is the wallpaper backend (not hyprpaper)
 - **waypaper** GUI sets the wallpaper and triggers `waypaper-hook.sh` as a post-command
-- The hook runs pywal, syncs Caelestia colors/wallpaper, reloads Hyprland, and updates GTK/Firefox themes
-- **sync-caelestia-wallpaper.sh** syncs Caelestia's wallpaper reference with swaybg on startup
-- **monitor-handler.py** listens for config reloads and restores swaybg/Caelestia if they get killed
+- The hook runs pywal, reloads Hyprland, and updates GTK/Firefox themes
+- **monitor-handler.py** listens for config reloads and restores swaybg if it gets killed
 
 ### System-Wide Theme Syncing
 
@@ -243,7 +234,7 @@ Workspace assignment (lines 7-17) distributes workspaces 1-4 to the external mon
 
 ### Monitor Handler
 
-The `monitor-handler.py` script runs in the background and listens for Hyprland config reloads. When a reload is detected, it checks if swaybg and Caelestia are still running, and restarts them if needed. This prevents losing your wallpaper or shell after editing the config.
+The `monitor-handler.py` script runs in the background and listens for Hyprland config reloads. When a reload is detected, it checks if swaybg is still running and restarts it if needed. This prevents losing your wallpaper after editing the config.
 
 ### Keyboard Layout
 
@@ -262,15 +253,14 @@ hyprduma-config/
 ├── hyprland.conf              # Main Hyprland configuration
 ├── pywal.sh                   # Apply pywal colors to all components
 ├── waypaper-hook.sh           # Auto-apply colors on wallpaper change
-├── sync-caelestia-wallpaper.sh # Sync swaybg wallpaper to Caelestia
-├── monitor-handler.py         # Restart wallpaper/shell after config reload
+├── monitor-handler.py         # Restart wallpaper after config reload
 ├── install.py                 # Interactive auto-installer
 ├── wallpapers/                # Included wallpapers
 ├── config/
 │   ├── kitty/kitty.conf       # Kitty terminal config with pywal support
 │   ├── fastfetch/             # Custom fastfetch config with ASCII art
 │   ├── nvim/                  # Neovim config
-│   └── wal/templates/         # Pywal templates for Hyprland & Caelestia
+│   └── wal/templates/         # Pywal templates for Hyprland
 ├── KEYBINDS.md                # Complete keybindings reference
 └── PYWAL-SETUP.md             # Detailed pywal integration guide
 ```
@@ -299,7 +289,7 @@ hyprduma-config/
 1. **Check if templates are installed:**
    ```bash
    ls ~/.config/wal/templates/
-   # Should show: hyprland-colors.conf, caelestia-scheme.json
+   # Should show: hyprland-colors.conf
    ```
 
    If missing, copy them:
@@ -356,12 +346,6 @@ hyprduma-config/
 - Ensure the script is executable: `chmod +x ~/.config/hypr/scripts/pywal.sh`
 - Check if pywal cache exists: `ls ~/.cache/wal/`
 - Manually reload: `pywal`
-
-### Caelestia colors not updating
-```bash
-# Restart Caelestia daemon
-pkill caelestia && sleep 0.5 && caelestia shell -d &
-```
 
 ### Wallpaper not showing after config reload
 The monitor handler should restore it automatically. If not:

@@ -53,22 +53,6 @@ else
     fi
 fi
 
-# Caelestia wallpaper
-if [ -f ~/.cache/wal/wal ]; then
-    WALLPAPER_PATH=$(cat ~/.cache/wal/wal)
-    mkdir -p ~/.local/state/caelestia/wallpaper
-    ln -sf "$WALLPAPER_PATH" ~/.local/state/caelestia/wallpaper/current
-    echo "$WALLPAPER_PATH" > ~/.local/state/caelestia/wallpaper/path.txt
-    echo "✓ Caelestia wallpaper reference updated"
-fi
-
-# Caelestia colors
-if [ -f ~/.cache/wal/caelestia-scheme.json ]; then
-    mkdir -p ~/.local/state/caelestia
-    cp ~/.cache/wal/caelestia-scheme.json ~/.local/state/caelestia/scheme.json
-    echo "✓ Caelestia colors updated"
-fi
-
 # GTK themes
 if command -v wal-gtk &> /dev/null; then
     wal-gtk
@@ -96,14 +80,6 @@ fi
 if command -v hyprctl &> /dev/null; then
     hyprctl reload
     echo "✓ Hyprland configuration reloaded"
-fi
-
-# Caelestia
-if pgrep -x "caelestia" > /dev/null; then
-    pkill caelestia
-    sleep 0.5
-    caelestia shell -d &
-    echo "✓ Caelestia shell restarted"
 fi
 
 # Kitty

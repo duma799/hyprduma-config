@@ -64,8 +64,11 @@ def print_info(msg):
 def ask_yn(prompt, default=True):
     suffix = " [Y/n] " if default else " [y/N] "
     try:
-        answer = input(f"  {MAGENTA}?{RESET} {prompt}{suffix}").strip().lower()
-    except (EOFError, KeyboardInterrupt):
+        with open("/dev/tty") as tty:
+            sys.stdout.write(f"  {MAGENTA}?{RESET} {prompt}{suffix}")
+            sys.stdout.flush()
+            answer = tty.readline().strip().lower()
+    except (OSError, KeyboardInterrupt):
         print()
         sys.exit(1)
     if not answer:
@@ -203,26 +206,43 @@ def install_caelestia():
         print_info("Caelestia will start automatically on next Hyprland session")
 
 
+def make_symlink(src: Path, dst: Path):
+    """Create symlink dst -> src, backing up any existing non-symlink at dst."""
+    if dst.is_symlink():
+        if dst.resolve() == src.resolve():
+            return  # already correct
+        dst.unlink()
+    elif dst.exists():
+        backup = dst.parent / (dst.name + ".backup")
+        if backup.exists():
+            shutil.rmtree(str(backup)) if backup.is_dir() else backup.unlink()
+        shutil.move(str(dst), str(backup))
+        print_warn(f"Backed up {dst} -> {backup}")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.symlink_to(src)
+
+
 def clone_repo():
     repo_dir = find_repo_dir()
     if repo_dir:
         print_ok(f"Using repo at: {repo_dir}")
         return repo_dir
 
-    clone_target = Path.home() / "Downloads" / "hyprduma-config"
+    clone_target = Path.home() / "hyprduma-config"
     print_info(f"Cloning to {clone_target}")
 
     if clone_target.exists():
-        if ask_yn(f"{clone_target} already exists. Remove and re-clone?"):
+        if (clone_target / "hyprland.conf").exists():
+            print_ok("Repo already exists, using it")
+            return clone_target
+        if ask_yn(f"{clone_target} exists but looks wrong. Remove and re-clone?"):
             shutil.rmtree(clone_target)
         else:
-            if (clone_target / "hyprland.conf").exists():
-                return clone_target
-            print_err("Directory exists but doesn't contain config files")
+            print_err("Cannot proceed without a valid repo directory")
             sys.exit(1)
 
     if run(f"git clone {REPO_URL} {clone_target}"):
-        print_ok("Repository cloned")
+        print_ok(f"Repository cloned to {clone_target}")
         return clone_target
     else:
         print_err("Failed to clone repository")
@@ -230,44 +250,25 @@ def clone_repo():
 
 
 def backup_configs():
-    config = Path.home() / ".config"
-    backed_up = []
-
-    for name in ["hypr", "waybar", "wlogout", "waypaper", "nvim", "fastfetch"]:
-        src = config / name
-        dst = config / f"{name}.backup"
-        if src.exists() and not src.is_symlink():
-            if dst.exists():
-                print_warn(f"{dst} already exists - skipping backup of {name}")
-                continue
-            shutil.move(str(src), str(dst))
-            backed_up.append(name)
-
-    if backed_up:
-        print_ok(f"Backed up: {', '.join(f'~/.config/{n}' for n in backed_up)}")
-    else:
-        print_ok("No existing configs to back up")
+    # Backups are now handled per-item in make_symlink; this step is a no-op.
+    print_ok("Backups handled automatically during symlinking")
 
 
 def install_hypr_config(repo):
     hypr_dir = Path.home() / ".config" / "hypr"
     hypr_dir.mkdir(parents=True, exist_ok=True)
 
-    shutil.copy2(repo / "hyprland.conf", hypr_dir / "hyprland.conf")
-    print_ok("Copied hyprland.conf")
+    make_symlink(repo / "hyprland.conf", hypr_dir / "hyprland.conf")
+    print_ok("Symlinked hyprland.conf")
 
     screenshots = Path.home() / "Pictures" / "Screenshots"
     screenshots.mkdir(parents=True, exist_ok=True)
     print_ok(f"Created {screenshots}")
 
     wallpapers_src = repo / "wallpapers"
-    wallpapers_dst = Path.home() / "wallpapers"
     if wallpapers_src.exists():
-        if wallpapers_dst.exists():
-            shutil.rmtree(wallpapers_dst)
-        shutil.copytree(str(wallpapers_src), str(wallpapers_dst))
-        count = len(list(wallpapers_dst.iterdir()))
-        print_ok(f"Copied {count} wallpapers to ~/wallpapers/")
+        make_symlink(wallpapers_src, Path.home() / "wallpapers")
+        print_ok("Symlinked ~/wallpapers/ -> repo/wallpapers/")
 
 
 def install_pywal(repo):
@@ -276,31 +277,20 @@ def install_pywal(repo):
     hypr_dir.mkdir(parents=True, exist_ok=True)
 
     # Pywal templates
-    templates_dst = home / ".config" / "wal" / "templates"
-    templates_dst.mkdir(parents=True, exist_ok=True)
     templates_src = repo / "config" / "wal" / "templates"
     if templates_src.exists():
-        for f in templates_src.iterdir():
-            shutil.copy2(str(f), str(templates_dst / f.name))
-        print_ok("Installed pywal templates")
+        (home / ".config" / "wal").mkdir(parents=True, exist_ok=True)
+        make_symlink(templates_src, home / ".config" / "wal" / "templates")
+        print_ok("Symlinked pywal templates")
     else:
         print_err("config/wal/templates not found in repo")
 
     # Scripts
+    scripts_src = repo / "scripts"
     scripts_dir = hypr_dir / "scripts"
-    scripts_dir.mkdir(parents=True, exist_ok=True)
-    for script in [
-        "pywal.sh",
-        "sync-caelestia-wallpaper.sh",
-        "waypaper-hook.sh",
-        "monitor-handler.py",
-    ]:
-        src = repo / "scripts" / script
-        dst = scripts_dir / script
-        if src.exists():
-            shutil.copy2(str(src), str(dst))
-            dst.chmod(0o755)
-    print_ok("Copied scripts to ~/.config/hypr/scripts/")
+    if scripts_src.exists():
+        make_symlink(scripts_src, scripts_dir)
+        print_ok("Symlinked scripts -> ~/.config/hypr/scripts/")
 
     # Waypaper hook
     hook_cmd = str(scripts_dir / "waypaper-hook.sh")
@@ -336,12 +326,10 @@ def install_pywal(repo):
     # pywal.sh is already in ~/.config/hypr/scripts/pywal.sh
 
     # Kitty
-    kitty_dir = home / ".config" / "kitty"
-    kitty_dir.mkdir(parents=True, exist_ok=True)
-    kitty_src = repo / "config" / "kitty" / "kitty.conf"
+    kitty_src = repo / "config" / "kitty"
     if kitty_src.exists():
-        shutil.copy2(str(kitty_src), kitty_dir / "kitty.conf")
-        print_ok("Installed kitty config with pywal colors")
+        make_symlink(kitty_src, home / ".config" / "kitty")
+        print_ok("Symlinked kitty config")
 
     # Bashrc
     bashrc = home / ".bashrc"
@@ -413,13 +401,10 @@ def install_fastfetch_config(repo):
         print_warn("Skipping fastfetch config")
         return
 
-    fastfetch_dst = home / ".config" / "fastfetch"
-    if fastfetch_dst.exists():
-        shutil.rmtree(str(fastfetch_dst))
-    shutil.copytree(str(fastfetch_src), str(fastfetch_dst))
+    make_symlink(fastfetch_src, home / ".config" / "fastfetch")
 
-    # Fix hardcoded home path
-    config_file = fastfetch_dst / "config.jsonc"
+    # Fix hardcoded home path in the repo file if needed
+    config_file = fastfetch_src / "config.jsonc"
     if config_file.exists():
         content = config_file.read_text()
         fixed = content.replace("/home/duma/", str(home) + "/")
@@ -427,7 +412,7 @@ def install_fastfetch_config(repo):
             config_file.write_text(fixed)
             print_ok("Fixed fastfetch config paths for current user")
 
-    print_ok("Installed fastfetch config to ~/.config/fastfetch/")
+    print_ok("Symlinked fastfetch config -> ~/.config/fastfetch/")
 
 
 def install_nvim_config(repo):
@@ -442,12 +427,8 @@ def install_nvim_config(repo):
         print_warn("Skipping Neovim config")
         return
 
-    nvim_dst = home / ".config" / "nvim"
-    if nvim_dst.exists():
-        shutil.rmtree(str(nvim_dst))
-    shutil.copytree(str(nvim_src), str(nvim_dst))
-
-    print_ok("Installed Neovim config to ~/.config/nvim/")
+    make_symlink(nvim_src, home / ".config" / "nvim")
+    print_ok("Symlinked Neovim config -> ~/.config/nvim/")
 
 
 def print_banner():
